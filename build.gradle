@@ -38,6 +38,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.jetbrains:annotations:24.0.0'
 
+    // 변경 이력 관리를 위한 라이브러리
+    implementation 'org.springframework.data:spring-data-envers'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
