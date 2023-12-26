@@ -27,6 +27,16 @@ dependencies {
     // jpa 관련 라이브러리 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // 메일 발송을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // redis 설정
+    implementation 'org.springframework.data:spring-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+
+    // 메일 템플릿 작성을 위한 thymeleaf 의존성 추가
+    implementation 'org.thymeleaf:thymeleaf'
+
     // mysql 설정
     implementation 'mysql:mysql-connector-java:8.0.33'
 
