@@ -1,11 +1,8 @@
 package com.fighting.weatherdress.member.dto;
 
-import com.fighting.weatherdress.global.type.Authority;
-import com.fighting.weatherdress.member.domain.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
