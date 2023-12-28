@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // 일회성 테스트로 disable 처리함
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@Disabled
 class EmailServiceTest {
 
   @Autowired
