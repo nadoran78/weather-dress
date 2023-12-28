@@ -41,6 +41,9 @@ public class Member extends BaseEntity {
   @Column(nullable = false)
   private String nickName;
 
+  @Column(nullable = false)
+  private boolean verified;
+
   @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
   private List<String> roles;
 
@@ -49,6 +52,7 @@ public class Member extends BaseEntity {
         .email(request.getEmail())
         .password(request.getPassword())
         .nickName(request.getNickName())
+        .verified(false)
         .roles(Collections.singletonList(Authority.ROLE_USER.toString()))
         .build();
   }
