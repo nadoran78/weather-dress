@@ -5,7 +5,7 @@ import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.mail.service.EmailService;
 import com.fighting.weatherdress.member.domain.Member;
-import com.fighting.weatherdress.member.dto.CustomUserDetails;
+import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import com.fighting.weatherdress.member.dto.SignUpDto;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;

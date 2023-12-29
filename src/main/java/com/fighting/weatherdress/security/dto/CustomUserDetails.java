@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.member.dto;
+package com.fighting.weatherdress.security.dto;
 
 import com.fighting.weatherdress.member.domain.Member;
 import java.util.Collection;
