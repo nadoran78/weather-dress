@@ -30,7 +30,7 @@ public class SecurityConfiguration {
   private final TokenProvider tokenProvider;
 
   private static final String[] ONLY_USER_URL = {
-      "/**"
+      "/post/**"
   };
 
   @Bean
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
             -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(request
             -> request.requestMatchers(ONLY_USER_URL).hasAuthority(Authority.ROLE_USER.toString()))
-        .authorizeHttpRequests(request -> request.anyRequest().permitAll())
+        .authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll())
         .exceptionHandling(e -> e.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
             .accessDeniedHandler(new CustomAccessDeniedHandler()))
         .addFilterBefore(new JwtAuthenticationFilter(tokenProvider),

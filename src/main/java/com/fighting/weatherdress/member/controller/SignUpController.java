@@ -2,6 +2,7 @@ package com.fighting.weatherdress.member.controller;
 
 import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.member.dto.SignUpDto;
+import com.fighting.weatherdress.member.dto.VerifyEmailDto;
 import com.fighting.weatherdress.member.service.SignUpService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -26,8 +27,7 @@ public class SignUpController {
   }
 
   @PostMapping("/verify")
-  public ResponseEntity<CommonResponse> verifyEmail(@RequestBody String email,
-      @RequestBody String code) {
-    return ResponseEntity.ok().body(signUpService.verifyEmail(email, code));
+  public ResponseEntity<CommonResponse> verifyEmail(@RequestBody VerifyEmailDto request) {
+    return ResponseEntity.ok().body(signUpService.verifyEmail(request.getEmail(), request.getCode()));
   }
 }
