@@ -84,7 +84,7 @@ public class TokenProvider {
 
     String email = claims.getSubject();
 
-    String findToken = refreshTokenRedisRepository.findByEmail(email)
+    String findToken = refreshTokenRedisRepository.findById(email)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REFRESH_TOKEN)).getToken();
     if (!refreshToken.equals(findToken)) {
       throw new CustomException(ErrorCode.UNMATCHED_SAVED_REFRESH_TOKEN);

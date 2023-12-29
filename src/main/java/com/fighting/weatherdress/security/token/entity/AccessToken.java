@@ -18,11 +18,7 @@ import org.springframework.data.redis.core.TimeToLive;
 public class AccessToken {
 
   @Id
-  private String email;
+  private String id;
 
   private String token;
-
-  @TimeToLive
-  private Long lifeSpan;
-
 }

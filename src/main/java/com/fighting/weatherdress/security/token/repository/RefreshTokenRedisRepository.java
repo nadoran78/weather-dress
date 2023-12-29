@@ -5,5 +5,5 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 public interface RefreshTokenRedisRepository extends CrudRepository<RefreshToken, String> {
-  Optional<RefreshToken> findByEmail(String email);
+  Optional<RefreshToken> findById(String id);
 }

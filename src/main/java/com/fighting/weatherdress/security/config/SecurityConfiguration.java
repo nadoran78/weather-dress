@@ -47,7 +47,7 @@ public class SecurityConfiguration {
         .sessionManagement(session
             -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(request
-            -> request.requestMatchers(ONLY_USER_URL).hasRole(Authority.ROLE_USER.toString()))
+            -> request.requestMatchers(ONLY_USER_URL).hasAuthority(Authority.ROLE_USER.toString()))
         .authorizeHttpRequests(request -> request.anyRequest().permitAll())
         .exceptionHandling(e -> e.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
             .accessDeniedHandler(new CustomAccessDeniedHandler()))

@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
+class SignUpServiceTest {
 
   @Mock
   private MemberRepository memberRepository;
@@ -34,7 +34,7 @@ class MemberServiceTest {
   @Mock
   private EmailService emailService;
   @InjectMocks
-  private MemberService memberService;
+  private SignUpService signUpService;
 
   @Test
   @DisplayName("회원가입 성공 테스트")
@@ -54,7 +54,7 @@ class MemberServiceTest {
         .password("1234")
         .nickName("아리아리")
         .build();
-    CommonResponse response = memberService.signUp(request);
+    CommonResponse response = signUpService.signUp(request);
     //then
     assertEquals(response, CommonResponse.SUCCESS);
   }
@@ -75,7 +75,7 @@ class MemberServiceTest {
         .nickName("아리아리")
         .build();
     CustomException customException = assertThrows(CustomException.class,
-        () -> memberService.signUp(request));
+        () -> signUpService.signUp(request));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.ALREADY_EXIST_EMAIL);
   }
@@ -93,7 +93,7 @@ class MemberServiceTest {
     //when
     String email = "abc@abcd.com";
     String code = "abcd";
-    CommonResponse response = memberService.verifyEmail(email, code);
+    CommonResponse response = signUpService.verifyEmail(email, code);
     //then
     assertEquals(response, CommonResponse.SUCCESS);
   }
@@ -108,7 +108,7 @@ class MemberServiceTest {
     String email = "abc@abcd.com";
     String code = "abcd";
     CustomException customException = assertThrows(CustomException.class,
-        () -> memberService.verifyEmail(email, code));
+        () -> signUpService.verifyEmail(email, code));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.NOT_FOUND_EMAIL);
   }
@@ -122,7 +122,7 @@ class MemberServiceTest {
     String email = "abc@abcd.com";
     String code = "abcd";
     CustomException customException = assertThrows(CustomException.class,
-        () -> memberService.verifyEmail(email, code));
+        () -> signUpService.verifyEmail(email, code));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.INVALID_CODE);
   }
