@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @Setter
@@ -19,5 +20,6 @@ public class AccessToken {
   @Id
   private String id;
 
+  @Indexed
   private String token;
 }
