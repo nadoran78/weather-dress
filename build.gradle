@@ -55,6 +55,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // 테스트 시 Base64 endcoding 가능하게 하기 위해 추가
+    testImplementation 'javax.xml.bind:jaxb-api:2.3.0'
 }
 
 tasks.named('test') {
