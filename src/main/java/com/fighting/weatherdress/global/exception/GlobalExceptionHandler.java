@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(CustomException.class)
   public ResponseEntity<CustomErrorResponse> handleCustomException(CustomException e) {
     log.error("{} is occurred.", e.getErrorCode());
-    return ResponseEntity.badRequest().body(
+    return ResponseEntity.status(e.getStatus()).body(
         CustomErrorResponse.builder()
             .errorCode(e.getErrorCode())
             .errorMessage(e.getErrorMessage())
