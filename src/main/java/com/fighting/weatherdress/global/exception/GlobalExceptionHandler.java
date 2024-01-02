@@ -2,6 +2,7 @@ package com.fighting.weatherdress.global.exception;
 
 import com.fighting.weatherdress.global.dto.CustomErrorResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
+import com.fighting.weatherdress.security.oauth2.OAuthException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
         CustomErrorResponse.builder()
             .errorCode(e.getErrorCode())
             .errorMessage(e.getErrorMessage())
+            .build());
+  }
+
+  @ExceptionHandler(OAuthException.class)
+  public ResponseEntity<CustomErrorResponse> handleOAuthException(OAuthException e) {
+    log.error("{} is occurred.", e.getErrorDescription());
+    return ResponseEntity.status(e.getStatus()).body(
+        CustomErrorResponse.builder()
+            .errorMessage(e.getErrorDescription())
             .build());
   }
 
