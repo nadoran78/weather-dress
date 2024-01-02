@@ -2,6 +2,7 @@ package com.fighting.weatherdress.security.oauth2.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fighting.weatherdress.security.oauth2.OAuthException;
 import com.fighting.weatherdress.security.oauth2.config.ClientKeyConfig;
 import com.fighting.weatherdress.security.oauth2.dto.OAuthToken;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +31,19 @@ public class NaverAuthApi {
     ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.POST,
         tokenRequest, String.class);
 
+    int responseStatusCode = response.getStatusCode().value();
     String responseBody = response.getBody();
 
     ObjectMapper objectMapper = new ObjectMapper();
+    OAuthToken oAuthToken = objectMapper.readValue(responseBody, OAuthToken.class);
 
-    return objectMapper.readValue(responseBody, OAuthToken.class);
+    if (responseStatusCode != 200) {
+      throw new OAuthException(responseStatusCode, oAuthToken.getError_description());
+    }
+    return oAuthToken;
   }
 
-  private HttpEntity<MultiValueMap<String, String>> makeHttpEntity(String code,
-      String state) {
+  private HttpEntity<MultiValueMap<String, String>> makeHttpEntity(String code, String state) {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
