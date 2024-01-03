@@ -46,4 +46,8 @@ public class SignInService {
     tokenProvider.addBlackList(token, email);
   }
 
+  public TokenResponse reissueToken(String refreshToken) {
+    return tokenProvider.regenerateAccessToken(refreshToken);
+  }
+
 }

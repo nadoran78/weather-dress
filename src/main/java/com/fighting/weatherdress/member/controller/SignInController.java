@@ -32,4 +32,10 @@ public class SignInController {
     signInService.signOut(accessToken, userDetails.getUsername());
     return ResponseEntity.ok(CommonResponse.SUCCESS);
   }
+
+  @PostMapping("/sign-in/reissue")
+  public ResponseEntity<TokenResponse> reissueToken(@RequestHeader("RefreshToken") String refreshToken) {
+    TokenResponse tokenResponse = signInService.reissueToken(refreshToken);
+    return ResponseEntity.ok(tokenResponse);
+  }
 }
