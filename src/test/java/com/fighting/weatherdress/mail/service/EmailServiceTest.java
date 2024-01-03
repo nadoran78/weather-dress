@@ -33,7 +33,7 @@ class EmailServiceTest {
   void successVerifiedEmail() {
     //given
     String email = "nadoran78@gmail.com";
-    String code = "Xy1xWU";
+    String code = "FGBInW";
     //when
     Boolean result = emailService.verifiedEmail(email, code);
     //then

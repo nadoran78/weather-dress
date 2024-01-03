@@ -1,48 +1,30 @@
 package com.fighting.weatherdress.mail.config;
 
 import java.util.Properties;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
+@RequiredArgsConstructor
 public class EmailConfiguration {
 
-  @Value("${spring.mail.host}")
-  private String host;
-
-  @Value("${spring.mail.port}")
-  private int port;
-
-  @Value("${spring.mail.username}")
-  private String username;
-
-  @Value("${spring.mail.password}")
-  private String password;
-
-  @Value("${spring.mail.properties.mail.smtp.auth}")
-  private boolean auth;
-
-  @Value("${spring.mail.properties.mail.smtp.ssl.enable}")
-  private boolean ssl;
-
-  @Value("${spring.mail.properties.mail.smtp.ssl.trust}")
-  private String sslTrust;
+  private final EmailProperties emailProperties;
 
   @Bean
   public JavaMailSender javaMailSender() {
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
     Properties properties = new Properties();
-    properties.put("mail.smtp.auth", auth);
-    properties.put("mail.smtp.ssl.enable", ssl);
-    properties.put("mail.smtp.ssl.trust", sslTrust);
+    properties.put("mail.smtp.auth", emailProperties.isAuth());
+    properties.put("mail.smtp.ssl.enable", emailProperties.isSsl());
+    properties.put("mail.smtp.ssl.trust", emailProperties.getSslTrust());
 
-    mailSender.setHost(host);
-    mailSender.setPort(port);
-    mailSender.setUsername(username);
-    mailSender.setPassword(password);
+    mailSender.setHost(emailProperties.getHost());
+    mailSender.setPort(emailProperties.getPort());
+    mailSender.setUsername(emailProperties.getUsername());
+    mailSender.setPassword(emailProperties.getPassword());
     mailSender.setJavaMailProperties(properties);
 
     return mailSender;
