@@ -33,7 +33,8 @@ class AccessTokenRedisRepositoryTest {
     accessTokenRedisRepository.save(accessToken2);
     //then
     Assertions.assertTrue(accessTokenRedisRepository.existsByToken(token1));
-    accessTokenRedisRepository.deleteAll();
+    accessTokenRedisRepository.delete(accessToken1);
+    accessTokenRedisRepository.delete(accessToken2);
   }
 
   @Test
