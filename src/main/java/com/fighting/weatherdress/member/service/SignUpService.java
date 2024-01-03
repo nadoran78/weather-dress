@@ -22,7 +22,7 @@ public class SignUpService {
   private final EmailService emailService;
 
   @Transactional
-  public CommonResponse signUp(SignUpDto request) throws MessagingException {
+  public void signUp(SignUpDto request) throws MessagingException {
     if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
       throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
@@ -33,18 +33,16 @@ public class SignUpService {
 
     emailService.sendEmail(savedMember.getEmail());
 
-    return CommonResponse.SUCCESS;
   }
 
   // 이메일 인증
   @Transactional
-  public CommonResponse verifyEmail(String email, String code) {
+  public void verifyEmail(String email, String code) {
     if (emailService.verifiedEmail(email, code)) {
       Member savedMember = memberRepository.findByEmail(email)
           .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_EMAIL));
       savedMember.setVerified(true);
       memberRepository.save(savedMember);
-      return CommonResponse.SUCCESS;
     } else {
       throw new CustomException(ErrorCode.INVALID_CODE);
     }

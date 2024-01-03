@@ -1,14 +1,11 @@
 package com.fighting.weatherdress.member.controller;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.member.dto.SignUpDto;
 import com.fighting.weatherdress.member.dto.VerifyEmailDto;
 import com.fighting.weatherdress.member.service.SignUpService;
@@ -49,7 +46,7 @@ class SignUpControllerTest {
         .password("qwe123!@#")
         .nickName("홍길동")
         .build();
-    given(signUpService.signUp(request)).willReturn(CommonResponse.SUCCESS);
+
     //when
     mockMvc.perform(post("/member/sign-up")
             .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +66,7 @@ class SignUpControllerTest {
         .password("qwe123")
         .nickName("123")
         .build();
-    given(signUpService.signUp(request)).willReturn(CommonResponse.SUCCESS);
+
     //when
     mockMvc.perform(post("/member/sign-up")
             .contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +91,7 @@ class SignUpControllerTest {
         .email("abcd@abcd.com")
         .code("aaaaaa")
         .build();
-    given(signUpService.verifyEmail(anyString(), anyString())).willReturn(CommonResponse.SUCCESS);
+
     //when
     mockMvc.perform(post("/member/verify")
             .contentType(MediaType.APPLICATION_JSON)
