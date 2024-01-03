@@ -55,6 +55,7 @@ class TokenProviderTest {
     //given
     String email = "abcd@abcd.com";
     List<String> roles = Collections.singletonList(Authority.ROLE_USER.toString());
+    given(refreshTokenRedisRepository.findById(anyString())).willReturn(Optional.empty());
     //when
     TokenResponse tokenResponse = tokenProvider.generateTokenResponse(email, roles);
     //then
