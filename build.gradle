@@ -54,13 +54,18 @@ dependencies {
     // 변경 이력 관리를 위한 라이브러리
     implementation 'org.springframework.data:spring-data-envers'
 
+    // json 파싱을 위한 의존성 추가
+    implementation 'com.google.code.gson:gson:2.9.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
     // 테스트 시 Base64 endcoding 가능하게 하기 위해 추가
-    testImplementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'com.sun.xml.bind:jaxb-impl'
+    implementation 'com.sun.xml.bind:jaxb-core'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
 }
 
 tasks.named('test') {
