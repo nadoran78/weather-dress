@@ -59,6 +59,11 @@ public class TokenProvider {
     String accessToken = generateToken(claims, ACCESS_TOKEN_EXPIRE_TIME);
     String refreshToken = generateToken(claims, REFRESH_TOKEN_EXPIRE_TIME);
 
+    // 이미 저장된 refreshToken이 존재할 경우 삭제하고 진행
+    if (refreshTokenRedisRepository.findById(email).isPresent()) {
+      RefreshToken savedRefreshToken = refreshTokenRedisRepository.findById(email).get();
+      refreshTokenRedisRepository.delete(savedRefreshToken);
+    }
     refreshTokenRedisRepository.save(new RefreshToken(email, refreshToken));
 
     return TokenResponse.builder()
