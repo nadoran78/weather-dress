@@ -1,9 +1,9 @@
-package com.fighting.weatherdress.security.oauth2.controller;
+package com.fighting.weatherdress.member.oauth2.controller;
 
 import com.fighting.weatherdress.security.dto.TokenResponse;
-import com.fighting.weatherdress.security.oauth2.dto.NaverProfile;
-import com.fighting.weatherdress.security.oauth2.dto.OAuthToken;
-import com.fighting.weatherdress.security.oauth2.service.NaverAuthService;
+import com.fighting.weatherdress.member.oauth2.dto.NaverProfile;
+import com.fighting.weatherdress.member.oauth2.dto.OAuthToken;
+import com.fighting.weatherdress.member.oauth2.service.NaverAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

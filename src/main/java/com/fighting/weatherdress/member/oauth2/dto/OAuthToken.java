@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.security.oauth2.dto;
+package com.fighting.weatherdress.member.oauth2.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

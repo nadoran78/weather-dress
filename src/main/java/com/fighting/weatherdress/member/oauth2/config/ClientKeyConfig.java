@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.security.oauth2.config;
+package com.fighting.weatherdress.member.oauth2.config;
 
 import lombok.Getter;
 import lombok.Setter;

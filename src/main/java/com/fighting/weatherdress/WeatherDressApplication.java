@@ -1,6 +1,6 @@
 package com.fighting.weatherdress;
 
-import com.fighting.weatherdress.security.oauth2.config.ClientKeyConfig;
+import com.fighting.weatherdress.member.oauth2.config.ClientKeyConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

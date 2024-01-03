@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.security.oauth2.dto;
+package com.fighting.weatherdress.member.oauth2.dto;
 
 import com.fighting.weatherdress.global.type.Authority;
 import com.fighting.weatherdress.member.domain.Member;

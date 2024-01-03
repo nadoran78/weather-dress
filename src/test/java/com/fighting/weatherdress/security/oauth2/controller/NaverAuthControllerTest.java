@@ -1,6 +1,6 @@
 package com.fighting.weatherdress.security.oauth2.controller;
 
-import com.fighting.weatherdress.security.oauth2.config.ClientKeyConfig;
+import com.fighting.weatherdress.member.oauth2.config.ClientKeyConfig;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

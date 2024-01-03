@@ -1,12 +1,12 @@
-package com.fighting.weatherdress.security.oauth2.service;
+package com.fighting.weatherdress.member.oauth2.service;
 
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.security.dto.TokenResponse;
-import com.fighting.weatherdress.security.oauth2.exception.OAuthException;
-import com.fighting.weatherdress.security.oauth2.config.ClientKeyConfig;
-import com.fighting.weatherdress.security.oauth2.dto.NaverProfile;
-import com.fighting.weatherdress.security.oauth2.dto.OAuthToken;
+import com.fighting.weatherdress.member.oauth2.exception.OAuthException;
+import com.fighting.weatherdress.member.oauth2.config.ClientKeyConfig;
+import com.fighting.weatherdress.member.oauth2.dto.NaverProfile;
+import com.fighting.weatherdress.member.oauth2.dto.OAuthToken;
 import com.fighting.weatherdress.security.token.TokenProvider;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
