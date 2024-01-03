@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class RedisUtil {
+public class RedisService {
   private final StringRedisTemplate template;
 
   public String getData(String key) {
