@@ -1,7 +1,6 @@
 package com.fighting.weatherdress.member.service;
 
 import com.fighting.weatherdress.global.exception.CustomException;
-import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.mail.service.EmailService;
 import com.fighting.weatherdress.member.domain.Member;
@@ -27,9 +26,10 @@ public class SignUpService {
       throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 
-    request.setPassword(passwordEncoder.encode(request.getPassword()));
+    Member member = Member.fromDto(request);
+    member.setPassword(passwordEncoder.encode(request.getPassword()));
 
-    Member savedMember = memberRepository.save(Member.fromDto(request));
+    Member savedMember = memberRepository.save(member);
 
     emailService.sendEmail(savedMember.getEmail());
 
