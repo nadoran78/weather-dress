@@ -40,5 +40,10 @@ public class SignInService {
     return tokenProvider.generateTokenResponse(member.getEmail(), member.getRoles());
   }
 
+  public void signOut(String accessToken, String email) {
+    String token = tokenProvider.resolveTokenFromRequest(accessToken);
+    tokenProvider.deleteRefreshToken(email);
+    tokenProvider.addBlackList(token, email);
+  }
 
 }
