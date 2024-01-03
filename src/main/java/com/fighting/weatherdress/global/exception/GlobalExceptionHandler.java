@@ -2,7 +2,7 @@ package com.fighting.weatherdress.global.exception;
 
 import com.fighting.weatherdress.global.dto.CustomErrorResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
-import com.fighting.weatherdress.security.oauth2.OAuthException;
+import com.fighting.weatherdress.security.oauth2.exception.OAuthException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;

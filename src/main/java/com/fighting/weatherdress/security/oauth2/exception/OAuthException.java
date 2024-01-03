@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.security.oauth2;
+package com.fighting.weatherdress.security.oauth2.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
