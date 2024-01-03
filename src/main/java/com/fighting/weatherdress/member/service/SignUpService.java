@@ -35,6 +35,10 @@ public class SignUpService {
 
   }
 
+  public void sendEmail(String email) throws MessagingException {
+    emailService.sendEmail(email);
+  }
+
   // 이메일 인증
   @Transactional
   public void verifyEmail(String email, String code) {

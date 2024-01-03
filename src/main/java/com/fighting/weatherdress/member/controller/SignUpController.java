@@ -27,6 +27,13 @@ public class SignUpController {
     return ResponseEntity.ok().body(CommonResponse.SUCCESS);
   }
 
+  @PostMapping("/email")
+  public ResponseEntity<CommonResponse> sendEmailWithVerifyCode(@RequestBody String email)
+      throws MessagingException {
+    signUpService.sendEmail(email);
+    return ResponseEntity.ok().body(CommonResponse.SUCCESS);
+  }
+
   @PostMapping("/verify")
   public ResponseEntity<CommonResponse> verifyEmail(@RequestBody VerifyEmailDto request) {
     signUpService.verifyEmail(request.getEmail(), request.getCode());
