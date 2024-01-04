@@ -29,7 +29,7 @@ public class SignInController {
   public ResponseEntity<CommonResponse> signOut(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestHeader("Authorization") String accessToken) {
-    signInService.signOut(accessToken, userDetails.getUsername());
+    signInService.signOut(accessToken, userDetails.getEmail());
     return ResponseEntity.ok(CommonResponse.SUCCESS);
   }
 
