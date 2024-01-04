@@ -153,6 +153,6 @@ public class TokenProvider {
 
   private long getTokenExpireTime(String token) {
     Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-    return (claims.getBody().getExpiration().getTime() - new Date().getTime()) * 1000;
+    return (claims.getBody().getExpiration().getTime() - new Date().getTime()) / 1000;
   }
 }
