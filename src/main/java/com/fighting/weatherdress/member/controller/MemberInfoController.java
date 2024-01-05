@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +36,13 @@ public class MemberInfoController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     MemberInfoDto memberInfo = memberInfoService.getMemberInfo(customUserDetails.getEmail());
     return ResponseEntity.ok(memberInfo);
+  }
+
+  @DeleteMapping
+  public ResponseEntity<CommonResponse> deleteMember(
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    memberInfoService.deleteMember(customUserDetails.getEmail());
+    return ResponseEntity.ok(CommonResponse.SUCCESS);
   }
 
 }
