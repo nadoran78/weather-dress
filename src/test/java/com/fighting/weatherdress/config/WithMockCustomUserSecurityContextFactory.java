@@ -18,8 +18,8 @@ public class WithMockCustomUserSecurityContextFactory implements
     SecurityContext context = SecurityContextHolder.createEmptyContext();
 
     Member member = Member.builder()
-        .email(customUser.first())
-        .password(customUser.second())
+        .email(customUser.email())
+        .password(customUser.password())
         .nickName("nickname")
         .verified(true)
         .roles(Collections.singletonList(Authority.ROLE_USER.toString()))
