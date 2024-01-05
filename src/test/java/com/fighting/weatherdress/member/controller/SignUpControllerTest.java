@@ -5,7 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.member.dto.SignUpDto;
 import com.fighting.weatherdress.member.dto.VerifyEmailDto;
 import com.fighting.weatherdress.member.service.SignUpService;
@@ -48,7 +50,7 @@ class SignUpControllerTest {
         .build();
 
     //when
-    mockMvc.perform(post("/member/sign-up")
+    mockMvc.perform(post("/sign-up")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
@@ -68,7 +70,7 @@ class SignUpControllerTest {
         .build();
 
     //when
-    mockMvc.perform(post("/member/sign-up")
+    mockMvc.perform(post("/sign-up")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
@@ -93,10 +95,23 @@ class SignUpControllerTest {
         .build();
 
     //when
-    mockMvc.perform(post("/member/verify")
+    mockMvc.perform(post("/verify")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andDo(print());
+  }
+
+  @Test
+  @WithMockCustomUser
+  @DisplayName("이메일 발송 성공 테스트")
+  void successSendEmailWithVerifyCode() throws Exception {
+    //then
+    mockMvc.perform(post("/email")
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .content(objectMapper.writeValueAsString("email")))
         .andExpect(status().isOk())
         .andDo(print());
   }

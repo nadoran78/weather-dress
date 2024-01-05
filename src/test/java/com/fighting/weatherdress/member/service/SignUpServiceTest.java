@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -126,5 +127,16 @@ class SignUpServiceTest {
         () -> signUpService.verifyEmail(email, code));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.INVALID_CODE);
+  }
+
+  @Test
+  void successSendEmail() throws MessagingException {
+    //given
+    signUpService.sendEmail("email");
+    //when
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    verify(emailService, times(1)).sendEmail(captor.capture());
+
+    assertEquals(captor.getValue(), "email");
   }
 }
