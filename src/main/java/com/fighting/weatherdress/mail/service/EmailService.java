@@ -6,8 +6,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMessage.RecipientType;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -16,6 +18,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EmailService {
   private final JavaMailSender mailSender;
   private final RedisService redisService;
@@ -71,6 +74,7 @@ public class EmailService {
   }
 
   // 메일 전송 메서드
+  @Async("threadPoolTaskExecutor")
   public void sendEmail(String toEmail) throws MessagingException {
     if (redisService.existData(toEmail)) {
       redisService.deleteData(toEmail);
@@ -79,6 +83,7 @@ public class EmailService {
     MimeMessage emailForm = createEmailForm(toEmail);
 
     mailSender.send(emailForm);
+    log.info("sendEmail complete by async");
   }
 
   // 입력 인증코드 검증 메서드
