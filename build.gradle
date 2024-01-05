@@ -23,9 +23,41 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // jpa 관련 라이브러리 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // 메일 발송을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // redis 설정
+    implementation 'org.springframework.data:spring-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+
+    // 메일 템플릿 작성을 위한 thymeleaf 의존성 추가
+    implementation 'org.thymeleaf:thymeleaf'
+
+    // mysql 설정
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
+    // 필드 유효성 검사를 위한 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 회원가입을 위한 스프링 시큐리티와 JWT 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'org.jetbrains:annotations:24.0.0'
+
+    // 변경 이력 관리를 위한 라이브러리
+    implementation 'org.springframework.data:spring-data-envers'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // 테스트 시 Base64 endcoding 가능하게 하기 위해 추가
+    testImplementation 'javax.xml.bind:jaxb-api:2.3.0'
 }
 
 tasks.named('test') {
