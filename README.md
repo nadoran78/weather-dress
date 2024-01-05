@@ -107,7 +107,7 @@
 - 날씨 알람 설정 및 알림(앱푸쉬 등)
 
 ### ERD
-![erd](doc/img/weather_dress_erd.png)
+![erd](doc/img/weather_dress.png)
 
 ### Troubleshooting
 [go to the troubleshooting section](doc/trouble_shooting.md)
