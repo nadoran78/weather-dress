@@ -30,7 +30,8 @@ public class SecurityConfiguration {
   private final TokenProvider tokenProvider;
 
   private static final String[] ONLY_USER_URL = {
-      "/sign-out"
+      "/sign-out",
+      "/member/**"
   };
 
   @Bean

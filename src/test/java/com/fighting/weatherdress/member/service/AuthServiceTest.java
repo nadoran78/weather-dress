@@ -27,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class SignInServiceTest {
+class AuthServiceTest {
 
   @Mock
   private MemberRepository memberRepository;
@@ -36,7 +36,7 @@ class SignInServiceTest {
   @Mock
   private TokenProvider tokenProvider;
   @InjectMocks
-  private SignInService signInService;
+  private AuthService authService;
 
   @Test
   @DisplayName("로그인 성공 테스트")
@@ -63,7 +63,7 @@ class SignInServiceTest {
         .email("abc")
         .password("111")
         .build();
-    TokenResponse response = signInService.signIn(request);
+    TokenResponse response = authService.signIn(request);
     //then
     assertEquals(response.getEmail(), "11");
     assertEquals(response.getAccessToken(), "22");
@@ -81,7 +81,7 @@ class SignInServiceTest {
         .password("111")
         .build();
     CustomException customException = assertThrows(CustomException.class,
-        () -> signInService.signIn(request));
+        () -> authService.signIn(request));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.NOT_FOUND_EMAIL);
   }
@@ -104,7 +104,7 @@ class SignInServiceTest {
         .password("111")
         .build();
     CustomException customException = assertThrows(CustomException.class,
-        () -> signInService.signIn(request));
+        () -> authService.signIn(request));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.REGISTERED_BY_SOCIAL);
   }
@@ -128,7 +128,7 @@ class SignInServiceTest {
         .password("111")
         .build();
     CustomException customException = assertThrows(CustomException.class,
-        () -> signInService.signIn(request));
+        () -> authService.signIn(request));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.INCORRECT_PASSWORD);
   }
@@ -152,7 +152,7 @@ class SignInServiceTest {
         .password("111")
         .build();
     CustomException customException = assertThrows(CustomException.class,
-        () -> signInService.signIn(request));
+        () -> authService.signIn(request));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.NEED_TO_VERIFY_EMAIL);
   }
@@ -163,7 +163,7 @@ class SignInServiceTest {
     //given
     given(tokenProvider.resolveTokenFromRequest(anyString())).willReturn("accessToken");
     //when
-    signInService.signOut("Bearer accessToken", "email");
+    authService.signOut("Bearer accessToken", "email");
 
     ArgumentCaptor<String> captor1 = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> captor2 = ArgumentCaptor.forClass(String.class);
@@ -180,7 +180,7 @@ class SignInServiceTest {
   void successReissueToken() {
     //given
     //when
-    signInService.reissueToken("refreshToken");
+    authService.reissueToken("refreshToken");
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     //then
     verify(tokenProvider, times(1)).regenerateAccessToken(captor.capture());

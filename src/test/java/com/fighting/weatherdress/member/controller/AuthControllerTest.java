@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.member.dto.SignInDto;
-import com.fighting.weatherdress.member.service.SignInService;
+import com.fighting.weatherdress.member.service.AuthService;
 import com.fighting.weatherdress.security.dto.TokenResponse;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +26,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = SignInController.class,
+@WebMvcTest(controllers = AuthController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)})
-class SignInControllerTest {
+class AuthControllerTest {
 
   @MockBean
-  private SignInService signInService;
+  private AuthService authService;
 
   @Autowired
   private MockMvc mockMvc;
@@ -54,7 +54,7 @@ class SignInControllerTest {
         .accessToken("22")
         .refreshToken("33")
         .build();
-    given(signInService.signIn(any(SignInDto.class))).willReturn(tokenResponse);
+    given(authService.signIn(any(SignInDto.class))).willReturn(tokenResponse);
     //when
     mockMvc.perform(post("/sign-in")
             .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +89,7 @@ class SignInControllerTest {
         .accessToken("22")
         .refreshToken("33")
         .build();
-    given(signInService.reissueToken(anyString())).willReturn(tokenResponse);
+    given(authService.reissueToken(anyString())).willReturn(tokenResponse);
     //when
     mockMvc.perform(post("/sign-in/reissue")
             .contentType(MediaType.APPLICATION_JSON)
