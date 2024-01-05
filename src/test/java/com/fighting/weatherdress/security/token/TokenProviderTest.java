@@ -13,7 +13,7 @@ import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.Authority;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.domain.Member;
-import com.fighting.weatherdress.member.service.MemberService;
+import com.fighting.weatherdress.member.service.CustomUserDetailService;
 import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import com.fighting.weatherdress.security.dto.TokenResponse;
 import com.fighting.weatherdress.security.token.entity.AccessToken;
@@ -43,7 +43,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class TokenProviderTest {
 
   @Mock
-  private MemberService memberService;
+  private CustomUserDetailService customUserDetailService;
   @Mock
   private RefreshTokenRedisRepository refreshTokenRedisRepository;
   @Mock
@@ -173,7 +173,7 @@ class TokenProviderTest {
         .roles(Collections.singletonList(Authority.ROLE_USER.toString()))
         .build();
     UserDetails userDetails = new CustomUserDetails(member);
-    given(memberService.loadUserByUsername(anyString())).willReturn(userDetails);
+    given(customUserDetailService.loadUserByUsername(anyString())).willReturn(userDetails);
     //when
     Authentication authentication = tokenProvider.getAuthentication(tokenResponse.getAccessToken());
     //then
