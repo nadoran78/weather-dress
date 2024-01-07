@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.global;
+package com.fighting.weatherdress.global.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
