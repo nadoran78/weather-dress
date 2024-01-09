@@ -36,6 +36,7 @@ public class ShortTermWeatherService {
   private final CoordinateLocationConvertor coordinateLocationConvertor;
   private final ShortTermWeatherProperties shortTermWeatherProperties;
   private final LocationRepository locationRepository;
+  private final RestTemplate restTemplate;
 
   private DailyShortWeather today;
   private DailyShortWeather tomorrow;
@@ -66,7 +67,6 @@ public class ShortTermWeatherService {
           now);
       URI uri = new URI(requestUri);
 
-      RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
       String responseBody = response.getBody();
 

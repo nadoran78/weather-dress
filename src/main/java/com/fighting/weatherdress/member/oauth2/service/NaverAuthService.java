@@ -31,11 +31,10 @@ public class NaverAuthService {
   private final ClientKeyConfig clientKeyConfig;
   private final MemberRepository memberRepository;
   private final TokenProvider tokenProvider;
+  private final RestTemplate restTemplate;
 
   public OAuthToken getOAuthToken(String code, String state) {
     String requestUri = "https://nid.naver.com/oauth2.0/token";
-
-    RestTemplate restTemplate = new RestTemplate();
 
     HttpEntity<MultiValueMap<String, String>> tokenRequest = makeHttpEntity(code, state);
 
@@ -76,7 +75,6 @@ public class NaverAuthService {
 
     String requestUri = "https://openapi.naver.com/v1/nid/me";
 
-    RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.GET,
         new HttpEntity<>(headers), String.class);
 

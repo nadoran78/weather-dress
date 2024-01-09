@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class CoordinateLocationConvertor {
+
+  private final RestTemplate restTemplate;
 
   @Value("${location.convert.kakao-key}")
   private String apiKey;
@@ -27,7 +31,6 @@ public class CoordinateLocationConvertor {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", apiKey);
 
-    RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.GET,
         new HttpEntity<>(headers), String.class);
 
