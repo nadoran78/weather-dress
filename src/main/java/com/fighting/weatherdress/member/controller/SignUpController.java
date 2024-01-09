@@ -23,11 +23,20 @@ public class SignUpController {
   @PostMapping("/sign-up")
   public ResponseEntity<CommonResponse> signUp(@Valid @RequestBody SignUpDto request)
       throws MessagingException {
-    return ResponseEntity.ok().body(signUpService.signUp(request));
+    signUpService.signUp(request);
+    return ResponseEntity.ok().body(CommonResponse.SUCCESS);
+  }
+
+  @PostMapping("/email")
+  public ResponseEntity<CommonResponse> sendEmailWithVerifyCode(@RequestBody String email)
+      throws MessagingException {
+    signUpService.sendEmail(email);
+    return ResponseEntity.ok().body(CommonResponse.SUCCESS);
   }
 
   @PostMapping("/verify")
   public ResponseEntity<CommonResponse> verifyEmail(@RequestBody VerifyEmailDto request) {
-    return ResponseEntity.ok().body(signUpService.verifyEmail(request.getEmail(), request.getCode()));
+    signUpService.verifyEmail(request.getEmail(), request.getCode());
+    return ResponseEntity.ok().body(CommonResponse.SUCCESS);
   }
 }

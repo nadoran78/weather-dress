@@ -21,11 +21,12 @@ class EmailServiceTest {
 
   @Test
   @DisplayName("이메일 발송 테스트")
-  void successSendEmail() throws MessagingException {
+  void successSendEmail() throws MessagingException, InterruptedException {
     //given
     String toEmail = "nadoran78@gmail.com";
     //when
     emailService.sendEmail(toEmail);
+    Thread.sleep(5 * 1000L);
   }
 
   @Test
@@ -33,7 +34,7 @@ class EmailServiceTest {
   void successVerifiedEmail() {
     //given
     String email = "nadoran78@gmail.com";
-    String code = "Xy1xWU";
+    String code = "FGBInW";
     //when
     Boolean result = emailService.verifiedEmail(email, code);
     //then

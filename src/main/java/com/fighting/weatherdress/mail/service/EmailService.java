@@ -1,13 +1,15 @@
 package com.fighting.weatherdress.mail.service;
 
-import com.fighting.weatherdress.global.util.RedisUtil;
+import com.fighting.weatherdress.global.util.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMessage.RecipientType;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -16,9 +18,10 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EmailService {
   private final JavaMailSender mailSender;
-  private final RedisUtil redisUtil;
+  private final RedisService redisService;
 
   @Value("${spring.mail.username}")
   private String configEmail;
@@ -65,25 +68,27 @@ public class EmailService {
     message.setFrom(configEmail);
     message.setText(setContext(authCode), "utf-8", "html");
 
-    redisUtil.setDataExpire(email, authCode, 60 * 30L); // redis에 인증코드 저장(만료시간 30분)
+    redisService.setDataExpire(email, authCode, 60 * 30L); // redis에 인증코드 저장(만료시간 30분)
 
     return message;
   }
 
   // 메일 전송 메서드
+  @Async("threadPoolTaskExecutor")
   public void sendEmail(String toEmail) throws MessagingException {
-    if (redisUtil.existData(toEmail)) {
-      redisUtil.deleteData(toEmail);
+    if (redisService.existData(toEmail)) {
+      redisService.deleteData(toEmail);
     }
 
     MimeMessage emailForm = createEmailForm(toEmail);
 
     mailSender.send(emailForm);
+    log.info("sendEmail complete by async");
   }
 
   // 입력 인증코드 검증 메서드
   public Boolean verifiedEmail(String email, String code) {
-    String savedCodeInRedis = redisUtil.getData(email);
+    String savedCodeInRedis = redisService.getData(email);
     if (savedCodeInRedis == null) {
       return false;
     }

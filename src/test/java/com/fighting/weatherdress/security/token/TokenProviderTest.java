@@ -3,8 +3,11 @@ package com.fighting.weatherdress.security.token;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.Authority;
@@ -13,7 +16,9 @@ import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.service.MemberService;
 import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import com.fighting.weatherdress.security.dto.TokenResponse;
+import com.fighting.weatherdress.security.token.entity.AccessToken;
 import com.fighting.weatherdress.security.token.entity.RefreshToken;
+import com.fighting.weatherdress.security.token.repository.AccessTokenRedisRepository;
 import com.fighting.weatherdress.security.token.repository.RefreshTokenRedisRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -26,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,6 +46,8 @@ class TokenProviderTest {
   private MemberService memberService;
   @Mock
   private RefreshTokenRedisRepository refreshTokenRedisRepository;
+  @Mock
+  private AccessTokenRedisRepository accessTokenRedisRepository;
   @InjectMocks
   private TokenProvider tokenProvider;
 
@@ -55,6 +63,7 @@ class TokenProviderTest {
     //given
     String email = "abcd@abcd.com";
     List<String> roles = Collections.singletonList(Authority.ROLE_USER.toString());
+    given(refreshTokenRedisRepository.findById(anyString())).willReturn(Optional.empty());
     //when
     TokenResponse tokenResponse = tokenProvider.generateTokenResponse(email, roles);
     //then
@@ -184,5 +193,40 @@ class TokenProviderTest {
     String resolvedToken = tokenProvider.resolveTokenFromRequest(token);
     //then
     assertEquals(resolvedToken, tokenResponse.getAccessToken());
+  }
+
+  @Test
+  @DisplayName("액세스 토큰 블랙리스트 추가 성공 테스트")
+  void successAddBlackList() {
+    //given
+    Date now = new Date();
+    Date beforeTwoHour = new Date(now.getTime() - (1000L * 60 * 60 * 2));
+    Date after30Seconds = new Date(now.getTime() + (1000L * 30));
+    Claims claims = Jwts.claims().setSubject("abc@abcd.com");
+    String token = Jwts.builder()
+        .setClaims(claims)
+        .setIssuedAt(beforeTwoHour)
+        .setExpiration(after30Seconds)
+        .signWith(SignatureAlgorithm.HS256, tokenProvider.getSecretKey())
+        .compact();
+    //when
+    ArgumentCaptor<AccessToken> captor = ArgumentCaptor.forClass(AccessToken.class);
+    tokenProvider.addBlackList(token, "abc@abcd.com");
+    //then(만료시간 확인)
+    verify(accessTokenRedisRepository, times(1)).save(captor.capture());
+    AccessToken accessToken = captor.getValue();
+    assertTrue(accessToken.getExpiration() < 30L);
+  }
+
+  @Test
+  @DisplayName("refreshToken 삭제 시 해당 토큰 없을 경우 예외 처리")
+  void deleteRefreshToken_NotFoundRefreshToken() {
+    //given
+    given(refreshTokenRedisRepository.findById(anyString())).willReturn(Optional.empty());
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> tokenProvider.deleteRefreshToken("email"));
+    //then
+    assertEquals(customException.getErrorCode(), ErrorCode.NOT_FOUND_REFRESH_TOKEN);
   }
 }

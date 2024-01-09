@@ -1,7 +1,6 @@
 package com.fighting.weatherdress.security.token.repository;
 
 import com.fighting.weatherdress.security.token.entity.RefreshToken;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,11 +15,6 @@ class RefreshTokenRedisRepositoryTest {
   @Autowired
   private RefreshTokenRedisRepository refreshTokenRedisRepository;
 
-  @AfterEach
-  void rollBack() {
-    refreshTokenRedisRepository.deleteAll();
-  }
-
   @Test
   void successfindById() {
     //given
@@ -33,11 +27,13 @@ class RefreshTokenRedisRepositoryTest {
         .token("bbbbbbbb")
         .build();
     //when
-    refreshTokenRedisRepository.save(refreshToken1);
-    refreshTokenRedisRepository.save(refreshToken2);
+    RefreshToken saved1 = refreshTokenRedisRepository.save(refreshToken1);
+    RefreshToken saved2 = refreshTokenRedisRepository.save(refreshToken2);
 
     RefreshToken refreshToken = refreshTokenRedisRepository.findById(email1).get();
     //then
     Assertions.assertEquals(refreshToken.getId(), email1);
+    refreshTokenRedisRepository.delete(saved1);
+    refreshTokenRedisRepository.delete(saved2);
   }
 }

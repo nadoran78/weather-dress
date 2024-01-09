@@ -6,9 +6,10 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.fighting.weatherdress.global.exception.CustomException;
-import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.mail.service.EmailService;
 import com.fighting.weatherdress.member.domain.Member;
@@ -54,9 +55,9 @@ class SignUpServiceTest {
         .password("1234")
         .nickName("아리아리")
         .build();
-    CommonResponse response = signUpService.signUp(request);
+    signUpService.signUp(request);
     //then
-    assertEquals(response, CommonResponse.SUCCESS);
+    verify(memberRepository, times(1)).save(any(Member.class));
   }
 
   @Test
@@ -93,9 +94,9 @@ class SignUpServiceTest {
     //when
     String email = "abc@abcd.com";
     String code = "abcd";
-    CommonResponse response = signUpService.verifyEmail(email, code);
+    signUpService.verifyEmail(email, code);
     //then
-    assertEquals(response, CommonResponse.SUCCESS);
+    verify(memberRepository, times(1)).save(any(Member.class));
   }
 
   @Test

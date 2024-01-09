@@ -1,7 +1,6 @@
 package com.fighting.weatherdress.member.service;
 
 import com.fighting.weatherdress.global.exception.CustomException;
-import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.mail.service.EmailService;
 import com.fighting.weatherdress.member.domain.Member;
@@ -22,29 +21,32 @@ public class SignUpService {
   private final EmailService emailService;
 
   @Transactional
-  public CommonResponse signUp(SignUpDto request) throws MessagingException {
+  public void signUp(SignUpDto request) throws MessagingException {
     if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
       throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 
-    request.setPassword(passwordEncoder.encode(request.getPassword()));
+    Member member = Member.fromDto(request);
+    member.setPassword(passwordEncoder.encode(request.getPassword()));
 
-    Member savedMember = memberRepository.save(Member.fromDto(request));
+    Member savedMember = memberRepository.save(member);
 
     emailService.sendEmail(savedMember.getEmail());
 
-    return CommonResponse.SUCCESS;
+  }
+
+  public void sendEmail(String email) throws MessagingException {
+    emailService.sendEmail(email);
   }
 
   // 이메일 인증
   @Transactional
-  public CommonResponse verifyEmail(String email, String code) {
+  public void verifyEmail(String email, String code) {
     if (emailService.verifiedEmail(email, code)) {
       Member savedMember = memberRepository.findByEmail(email)
           .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_EMAIL));
       savedMember.setVerified(true);
       memberRepository.save(savedMember);
-      return CommonResponse.SUCCESS;
     } else {
       throw new CustomException(ErrorCode.INVALID_CODE);
     }

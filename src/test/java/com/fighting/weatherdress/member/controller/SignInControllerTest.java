@@ -1,14 +1,18 @@
 package com.fighting.weatherdress.member.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fighting.weatherdress.member.dto.SignUpDto;
-import com.fighting.weatherdress.member.dto.VerifyEmailDto;
-import com.fighting.weatherdress.member.service.SignUpService;
+import com.fighting.weatherdress.config.WithMockCustomUser;
+import com.fighting.weatherdress.member.dto.SignInDto;
+import com.fighting.weatherdress.member.service.SignInService;
+import com.fighting.weatherdress.security.dto.TokenResponse;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +26,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = SignUpController.class,
+@WebMvcTest(controllers = SignInController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)})
-class SignUpControllerTest {
+class SignInControllerTest {
 
   @MockBean
-  private SignUpService signUpService;
+  private SignInService signInService;
 
   @Autowired
   private MockMvc mockMvc;
@@ -36,68 +40,66 @@ class SignUpControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @DisplayName("회원가입 요청 성공")
   @Test
+  @DisplayName("로그인 성공 테스트")
   @WithMockUser
-  void successSignUp() throws Exception {
+  void successSignIn() throws Exception {
     //given
-    SignUpDto request = SignUpDto.builder()
+    SignInDto request = SignInDto.builder()
         .email("abcd@abcd.com")
-        .password("qwe123!@#")
-        .nickName("홍길동")
+        .password("12345")
         .build();
-
+    TokenResponse tokenResponse = TokenResponse.builder()
+        .email("11")
+        .accessToken("22")
+        .refreshToken("33")
+        .build();
+    given(signInService.signIn(any(SignInDto.class))).willReturn(tokenResponse);
     //when
-    mockMvc.perform(post("/member/sign-up")
+    mockMvc.perform(post("/sign-in")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("11"))
+        .andExpect(jsonPath("$.accessToken").value("22"))
+        .andExpect(jsonPath("$.refreshToken").value("33"))
         .andDo(print());
   }
 
-  @DisplayName("회원가입 시 유효성 검사 실패 테스트")
   @Test
-  @WithMockUser
-  void signUp_InvalidDto() throws Exception {
-    //given
-    SignUpDto request = SignUpDto.builder()
-        .email("abcdabcd.com")
-        .password("qwe123")
-        .nickName("123")
-        .build();
-
-    //when
-    mockMvc.perform(post("/member/sign-up")
+  @DisplayName("로그아웃 성공 테스트")
+  @WithMockCustomUser
+  void successSignOut() throws Exception {
+    mockMvc.perform(post("/sign-out")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.password")
-            .value("비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요."))
-        .andExpect(jsonPath("$.nickName")
-            .value("이름은 숫자, 특수문자를 제외한 2~10자리여야 합니다."))
-        .andExpect(jsonPath("$.email")
-            .value("유효한 이메일 주소가 아닙니다."))
-        .andDo(print());
-  }
-
-  @DisplayName("이메일 인증 성공")
-  @Test
-  @WithMockUser
-  void successVerifyEmail() throws Exception {
-    //given
-    VerifyEmailDto request = VerifyEmailDto.builder()
-        .email("abcd@abcd.com")
-        .code("aaaaaa")
-        .build();
-
-    //when
-    mockMvc.perform(post("/member/verify")
-            .contentType(MediaType.APPLICATION_JSON)
-            .with(SecurityMockMvcRequestPostProcessors.csrf())
-            .content(objectMapper.writeValueAsString(request)))
+            .header("Authorization", "accessToken"))
         .andExpect(status().isOk())
         .andDo(print());
   }
+
+  @Test
+  @DisplayName("토큰 재발급 성공 테스트")
+  @WithMockUser
+  void successReissueToken() throws Exception {
+    //given
+    TokenResponse tokenResponse = TokenResponse.builder()
+        .email("11")
+        .accessToken("22")
+        .refreshToken("33")
+        .build();
+    given(signInService.reissueToken(anyString())).willReturn(tokenResponse);
+    //when
+    mockMvc.perform(post("/sign-in/reissue")
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .header("RefreshToken", "refreshToken"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("11"))
+        .andExpect(jsonPath("$.accessToken").value("22"))
+        .andExpect(jsonPath("$.refreshToken").value("33"))
+        .andDo(print());
+  }
+
 }

@@ -2,49 +2,66 @@ package com.fighting.weatherdress.security.dto;
 
 import com.fighting.weatherdress.member.domain.Member;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @RequiredArgsConstructor
+@Getter
 public class CustomUserDetails implements UserDetails {
 
-  private final Member member;
+  private Long id;
+  private String email;
+  private String password;
+  private String nickName;
+  private boolean verified;
+  private List<String> roles;
+
+  public CustomUserDetails(Member member) {
+    this.id = member.getId();
+    this.email = member.getEmail();
+    this.password = member.getPassword();
+    this.nickName = member.getNickName();
+    this.verified = member.isVerified();
+    this.roles = member.getRoles();
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return member.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
   }
 
   @Override
   public String getPassword() {
-    return null;
+    return password;
   }
 
   @Override
   public String getUsername() {
-    return member.getEmail();
+    return email;
   }
 
   @Override
   public boolean isAccountNonExpired() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isEnabled() {
-    return false;
+    return true;
   }
 }

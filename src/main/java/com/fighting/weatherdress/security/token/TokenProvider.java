@@ -4,6 +4,7 @@ import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.service.MemberService;
 import com.fighting.weatherdress.security.dto.TokenResponse;
+import com.fighting.weatherdress.security.token.entity.AccessToken;
 import com.fighting.weatherdress.security.token.entity.RefreshToken;
 import com.fighting.weatherdress.security.token.repository.AccessTokenRedisRepository;
 import com.fighting.weatherdress.security.token.repository.RefreshTokenRedisRepository;
@@ -58,6 +59,11 @@ public class TokenProvider {
     String accessToken = generateToken(claims, ACCESS_TOKEN_EXPIRE_TIME);
     String refreshToken = generateToken(claims, REFRESH_TOKEN_EXPIRE_TIME);
 
+    // 이미 저장된 refreshToken이 존재할 경우 삭제하고 진행
+    if (refreshTokenRedisRepository.findById(email).isPresent()) {
+      RefreshToken savedRefreshToken = refreshTokenRedisRepository.findById(email).get();
+      refreshTokenRedisRepository.delete(savedRefreshToken);
+    }
     refreshTokenRedisRepository.save(new RefreshToken(email, refreshToken));
 
     return TokenResponse.builder()
@@ -134,4 +140,19 @@ public class TokenProvider {
     return null;
   }
 
+  public void deleteRefreshToken(String email) {
+    RefreshToken refreshToken = refreshTokenRedisRepository.findById(email)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
+    refreshTokenRedisRepository.delete(refreshToken);
+  }
+
+  public void addBlackList(String accessToken, String email) {
+    long expirationSeconds = getTokenExpireTime(accessToken);
+    accessTokenRedisRepository.save(new AccessToken(email, accessToken, expirationSeconds));
+  }
+
+  private long getTokenExpireTime(String token) {
+    Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+    return (claims.getBody().getExpiration().getTime() - new Date().getTime()) / 1000;
+  }
 }
