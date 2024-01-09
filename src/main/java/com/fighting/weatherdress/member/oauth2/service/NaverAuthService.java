@@ -47,7 +47,7 @@ public class NaverAuthService {
 
     if (responseStatusCode != 200) {
       assert oAuthToken != null;
-      throw new OAuthException(responseStatusCode, oAuthToken.getError_description());
+      throw new OAuthException(responseStatusCode, oAuthToken.getErrorDescription());
     }
     return oAuthToken;
   }
