@@ -2,7 +2,7 @@ package com.fighting.weatherdress.member.controller;
 
 import com.fighting.weatherdress.global.type.CommonResponse;
 import com.fighting.weatherdress.member.dto.SignInDto;
-import com.fighting.weatherdress.member.service.SignInService;
+import com.fighting.weatherdress.member.service.AuthService;
 import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import com.fighting.weatherdress.security.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class SignInController {
+public class AuthController {
 
-  private final SignInService signInService;
+  private final AuthService authService;
 
   @PostMapping("/sign-in")
   public ResponseEntity<TokenResponse> signIn(@RequestBody SignInDto request) {
-    TokenResponse tokenResponse = signInService.signIn(request);
+    TokenResponse tokenResponse = authService.signIn(request);
     return ResponseEntity.ok(tokenResponse);
   }
 
@@ -29,13 +29,13 @@ public class SignInController {
   public ResponseEntity<CommonResponse> signOut(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestHeader("Authorization") String accessToken) {
-    signInService.signOut(accessToken, userDetails.getEmail());
+    authService.signOut(accessToken, userDetails.getEmail());
     return ResponseEntity.ok(CommonResponse.SUCCESS);
   }
 
   @PostMapping("/sign-in/reissue")
   public ResponseEntity<TokenResponse> reissueToken(@RequestHeader("RefreshToken") String refreshToken) {
-    TokenResponse tokenResponse = signInService.reissueToken(refreshToken);
+    TokenResponse tokenResponse = authService.reissueToken(refreshToken);
     return ResponseEntity.ok(tokenResponse);
   }
 }

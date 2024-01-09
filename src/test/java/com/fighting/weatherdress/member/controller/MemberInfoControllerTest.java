@@ -1,5 +1,9 @@
 package com.fighting.weatherdress.member.controller;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -7,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
-import com.fighting.weatherdress.member.dto.SignUpDto;
-import com.fighting.weatherdress.member.dto.VerifyEmailDto;
-import com.fighting.weatherdress.member.service.SignUpService;
+import com.fighting.weatherdress.member.dto.ChangePasswordDto;
+import com.fighting.weatherdress.member.service.MemberInfoService;
+import com.fighting.weatherdress.security.dto.MemberInfoDto;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,37 +23,32 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = SignUpController.class,
+@WebMvcTest(controllers = MemberInfoController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)})
-class SignUpControllerTest {
+class MemberInfoControllerTest {
 
   @MockBean
-  private SignUpService signUpService;
-
+  private MemberInfoService memberInfoService;
   @Autowired
   private MockMvc mockMvc;
-
   @Autowired
   private ObjectMapper objectMapper;
 
-  @DisplayName("회원가입 요청 성공")
   @Test
-  @WithMockUser
-  void successSignUp() throws Exception {
+  @DisplayName("비밀번호 변경 성공 테스트")
+  @WithMockCustomUser
+  void successChangePassword() throws Exception {
     //given
-    SignUpDto request = SignUpDto.builder()
-        .email("abcd@abcd.com")
-        .password("qwe123!@#")
-        .nickName("홍길동")
+    ChangePasswordDto request = ChangePasswordDto.builder()
+        .newPassword("qwe123!@#")
+        .code("code")
         .build();
-
     //when
-    mockMvc.perform(post("/sign-up")
+    mockMvc.perform(post("/member/password-change")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
@@ -57,61 +56,57 @@ class SignUpControllerTest {
         .andDo(print());
   }
 
-  @DisplayName("회원가입 시 유효성 검사 실패 테스트")
   @Test
-  @WithMockUser
-  void signUp_InvalidDto() throws Exception {
+  @DisplayName("비밀번호 변경 시 유효성 검사 실패 테스트")
+  @WithMockCustomUser
+  void changePassword_InvalidDto() throws Exception {
     //given
-    SignUpDto request = SignUpDto.builder()
-        .email("abcdabcd.com")
-        .password("qwe123")
-        .nickName("123")
+    ChangePasswordDto request = ChangePasswordDto.builder()
+        .newPassword("newPassword")
+        .code("code")
         .build();
-
     //when
-    mockMvc.perform(post("/sign-up")
+    mockMvc.perform(post("/member/password-change")
             .contentType(MediaType.APPLICATION_JSON)
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.password")
+        .andExpect(jsonPath("$.newPassword")
             .value("비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요."))
-        .andExpect(jsonPath("$.nickName")
-            .value("이름은 숫자, 특수문자를 제외한 2~10자리여야 합니다."))
-        .andExpect(jsonPath("$.email")
-            .value("유효한 이메일 주소가 아닙니다."))
-        .andDo(print());
-  }
-
-  @DisplayName("이메일 인증 성공")
-  @Test
-  @WithMockUser
-  void successVerifyEmail() throws Exception {
-    //given
-    VerifyEmailDto request = VerifyEmailDto.builder()
-        .email("abcd@abcd.com")
-        .code("aaaaaa")
-        .build();
-
-    //when
-    mockMvc.perform(post("/verify")
-            .contentType(MediaType.APPLICATION_JSON)
-            .with(SecurityMockMvcRequestPostProcessors.csrf())
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk())
         .andDo(print());
   }
 
   @Test
+  @DisplayName("회원정보 조회 성공 테스트")
   @WithMockCustomUser
-  @DisplayName("이메일 발송 성공 테스트")
-  void successSendEmailWithVerifyCode() throws Exception {
-    //then
-    mockMvc.perform(post("/email")
+  void successGetMemberInfo() throws Exception {
+    //given경
+    MemberInfoDto memberInfoDto = MemberInfoDto.builder()
+        .email("userEmail")
+        .nickName("nickName")
+        .build();
+    given(memberInfoService.getMemberInfo(anyString())).willReturn(memberInfoDto);
+    //when
+    mockMvc.perform(get("/member")
             .contentType(MediaType.APPLICATION_JSON)
-            .with(SecurityMockMvcRequestPostProcessors.csrf())
-            .content(objectMapper.writeValueAsString("email")))
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("userEmail"))
+        .andExpect(jsonPath("$.nickName").value("nickName"))
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("회원탈퇴 성공 테스트")
+  @WithMockCustomUser
+  void successDeleteMember() throws Exception {
+    //given
+    //when
+    mockMvc.perform(delete("/member")
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
         .andExpect(status().isOk())
         .andDo(print());
   }
+
 }

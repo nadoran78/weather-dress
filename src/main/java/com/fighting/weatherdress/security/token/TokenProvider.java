@@ -2,7 +2,7 @@ package com.fighting.weatherdress.security.token;
 
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.ErrorCode;
-import com.fighting.weatherdress.member.service.MemberService;
+import com.fighting.weatherdress.member.service.CustomUserDetailService;
 import com.fighting.weatherdress.security.dto.TokenResponse;
 import com.fighting.weatherdress.security.token.entity.AccessToken;
 import com.fighting.weatherdress.security.token.entity.RefreshToken;
@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class TokenProvider {
 
-  private final MemberService memberService;
+  private final CustomUserDetailService customUserDetailService;
   private final AccessTokenRedisRepository accessTokenRedisRepository;
   private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
@@ -123,7 +123,7 @@ public class TokenProvider {
   public Authentication getAuthentication(String token) {
     String email = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
         .getBody().getSubject();
-    UserDetails userDetails = memberService.loadUserByUsername(email);
+    UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
 
     return new UsernamePasswordAuthenticationToken(
         userDetails, "", userDetails.getAuthorities());

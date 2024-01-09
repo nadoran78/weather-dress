@@ -8,14 +8,13 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member")
 public class SignUpController {
 
   private final SignUpService signUpService;
@@ -28,6 +27,7 @@ public class SignUpController {
   }
 
   @PostMapping("/email")
+  @PreAuthorize(value = "hasRole('USER')")
   public ResponseEntity<CommonResponse> sendEmailWithVerifyCode(@RequestBody String email)
       throws MessagingException {
     signUpService.sendEmail(email);
