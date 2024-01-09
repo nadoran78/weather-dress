@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public class ShortTermWeatherService {
   }
 
   // 위경도를 통해 단기 날씨 조회
+  @Cacheable(value = "shortTermWeather")
   @Transactional
   public ShortTermWeatherResponse getWeatherFromApi(String sido, String sigungu)
       throws URISyntaxException {
