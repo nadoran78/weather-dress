@@ -23,7 +23,7 @@ public class NaverAuthController {
     OAuthToken oAuthToken = naverAuthService.getOAuthToken(code, state);
 
     // 사용자 정보 조회
-    NaverProfile naverProfile = naverAuthService.getNaverProfile(oAuthToken.getAccess_token());
+    NaverProfile naverProfile = naverAuthService.getNaverProfile(oAuthToken.getAccessToken());
 
     // 멤버 등록 및 업데이트 후 토큰 발급
     TokenResponse tokenResponse = naverAuthService.saveOrUpdateMemberAndGetToken(naverProfile);

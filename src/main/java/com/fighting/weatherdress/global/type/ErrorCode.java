@@ -23,7 +23,10 @@ public enum ErrorCode {
   NOT_FOUND_REFRESH_TOKEN(500, "토큰정보가 저장되어 있지 않습니다."),
   UNMATCHED_SAVED_REFRESH_TOKEN(500, "저장된 토큰과 일치하지 않습니다."),
   ACCESS_DENIED(400, "접근 권한이 없습니다."),
-  NEED_TO_SIGNIN(400, "로그인을 해야 합니다.");
+  NEED_TO_SIGNIN(400, "로그인을 해야 합니다."),
+
+  // 단기예보 관련
+  NOT_FOUND_LOCATION(500, "일치하는 지역이 없습니다.");
 
   private final int status;
   private final String description;
