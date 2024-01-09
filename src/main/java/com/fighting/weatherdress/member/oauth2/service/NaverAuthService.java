@@ -38,16 +38,15 @@ public class NaverAuthService {
 
     HttpEntity<MultiValueMap<String, String>> tokenRequest = makeHttpEntity(code, state);
 
-    ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.POST,
-        tokenRequest, String.class);
+    ResponseEntity<OAuthToken> response = restTemplate.exchange(requestUri, HttpMethod.POST,
+        tokenRequest, OAuthToken.class);
 
     int responseStatusCode = response.getStatusCode().value();
-    String responseBody = response.getBody();
 
-    Gson gson = new Gson();
-    OAuthToken oAuthToken = gson.fromJson(responseBody, OAuthToken.class);
+    OAuthToken oAuthToken = response.getBody();
 
     if (responseStatusCode != 200) {
+      assert oAuthToken != null;
       throw new OAuthException(responseStatusCode, oAuthToken.getError_description());
     }
     return oAuthToken;
