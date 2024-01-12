@@ -59,7 +59,8 @@ public class LongTermWeatherService {
         .build();
   }
 
-  @Scheduled(cron = "0 5 6,18 * * *")
+  // 중기 예보 db 저장 기능 - 향후 spring batch 적용 예정
+  @Scheduled(cron = "${schedules.cron.update.weather}")
   @Transactional
   public void updateLongTermWeather()
       throws URISyntaxException, NoSuchFieldException, IllegalAccessException {
