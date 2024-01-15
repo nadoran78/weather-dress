@@ -1,6 +1,6 @@
 package com.fighting.weatherdress.member.domain;
 
-import com.fighting.weatherdress.global.BaseEntity;
+import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.type.Authority;
 import com.fighting.weatherdress.member.domain.converter.RolesConverter;
 import com.fighting.weatherdress.member.dto.SignUpDto;

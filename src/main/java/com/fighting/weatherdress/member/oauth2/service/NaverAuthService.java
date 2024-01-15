@@ -31,25 +31,23 @@ public class NaverAuthService {
   private final ClientKeyConfig clientKeyConfig;
   private final MemberRepository memberRepository;
   private final TokenProvider tokenProvider;
+  private final RestTemplate restTemplate;
 
   public OAuthToken getOAuthToken(String code, String state) {
     String requestUri = "https://nid.naver.com/oauth2.0/token";
 
-    RestTemplate restTemplate = new RestTemplate();
-
     HttpEntity<MultiValueMap<String, String>> tokenRequest = makeHttpEntity(code, state);
 
-    ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.POST,
-        tokenRequest, String.class);
+    ResponseEntity<OAuthToken> response = restTemplate.exchange(requestUri, HttpMethod.POST,
+        tokenRequest, OAuthToken.class);
 
     int responseStatusCode = response.getStatusCode().value();
-    String responseBody = response.getBody();
 
-    Gson gson = new Gson();
-    OAuthToken oAuthToken = gson.fromJson(responseBody, OAuthToken.class);
+    OAuthToken oAuthToken = response.getBody();
 
     if (responseStatusCode != 200) {
-      throw new OAuthException(responseStatusCode, oAuthToken.getError_description());
+      assert oAuthToken != null;
+      throw new OAuthException(responseStatusCode, oAuthToken.getErrorDescription());
     }
     return oAuthToken;
   }
@@ -76,7 +74,6 @@ public class NaverAuthService {
 
     String requestUri = "https://openapi.naver.com/v1/nid/me";
 
-    RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.GET,
         new HttpEntity<>(headers), String.class);
 
