@@ -1,10 +1,7 @@
 package com.fighting.weatherdress.weather.service;
 
 import com.fighting.weatherdress.weather.dto.LocationDto;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fighting.weatherdress.weather.dto.api.CoordinateLocationConvertResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -31,20 +28,15 @@ public class CoordinateLocationConvertor {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", apiKey);
 
-    ResponseEntity<String> response = restTemplate.exchange(requestUri, HttpMethod.GET,
-        new HttpEntity<>(headers), String.class);
+    ResponseEntity<CoordinateLocationConvertResponse> response = restTemplate.exchange(requestUri,
+        HttpMethod.GET, new HttpEntity<>(headers), CoordinateLocationConvertResponse.class);
 
-    String responseBody = response.getBody();
+    CoordinateLocationConvertResponse responseBody = response.getBody();
 
     assert responseBody != null;
-    JsonElement element = JsonParser.parseString(responseBody);
-    JsonObject object = element.getAsJsonObject();
-    JsonArray array = object.getAsJsonArray("documents");
-    JsonObject document = array.get(0).getAsJsonObject();
-    JsonObject address = document.getAsJsonObject("address");
-    JsonElement sido = address.get("region_1depth_name");
-    JsonElement sigungu = address.get("region_2depth_name");
+    String sido = responseBody.getDocuments().get(0).getAddress().getRegion1DepthName();
+    String sigungu = responseBody.getDocuments().get(0).getAddress().getRegion2DepthName();
 
-    return new LocationDto(sido.getAsString(), sigungu.getAsString());
+    return new LocationDto(sido, sigungu);
   }
 }
