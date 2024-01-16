@@ -1,5 +1,6 @@
 package com.fighting.weatherdress.global.entity;
 
+import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.weather.entity.WeeklyWeather;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,5 +50,9 @@ public class Location extends BaseEntity{
   @Builder.Default
   @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<WeeklyWeather> weeklyWeathers = new ArrayList<>();
+
+  @Builder.Default
+  @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Post> posts = new ArrayList<>();
 
 }
