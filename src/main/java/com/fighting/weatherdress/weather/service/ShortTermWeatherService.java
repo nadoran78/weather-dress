@@ -8,13 +8,11 @@ import com.fighting.weatherdress.weather.config.ShortTermWeatherProperties;
 import com.fighting.weatherdress.weather.dto.DailyShortWeather;
 import com.fighting.weatherdress.weather.dto.LocationDto;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
+import com.fighting.weatherdress.weather.dto.api.ResponseFromShortTermWeather;
+import com.fighting.weatherdress.weather.dto.api.subclass.ShortTermWeatherItem;
 import com.fighting.weatherdress.weather.type.DressByTemperature;
 import com.fighting.weatherdress.weather.type.PrecipitationTypeCode;
 import com.fighting.weatherdress.weather.type.SkyCode;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -22,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -69,10 +68,12 @@ public class ShortTermWeatherService {
           now);
       URI uri = new URI(requestUri);
 
-      ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
-      String responseBody = response.getBody();
+      ResponseEntity<ResponseFromShortTermWeather> response = restTemplate.getForEntity(uri,
+          ResponseFromShortTermWeather.class);
+      ResponseFromShortTermWeather responseBody = response.getBody();
 
       // response 파싱 및 DailyShortWeather 객체에 데이터 입력
+      assert responseBody != null;
       isDataNull = parseResponseAndInputData(responseBody);
       pageNo++;
     }
@@ -148,26 +149,19 @@ public class ShortTermWeatherService {
     return today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
   }
 
-  private boolean parseResponseAndInputData(String responseBody) {
+  private boolean parseResponseAndInputData(ResponseFromShortTermWeather responseBody) {
 
-    JsonElement element = JsonParser.parseString(responseBody);
-    JsonObject object = element.getAsJsonObject();
-    JsonObject response = object.getAsJsonObject("response");
-    JsonObject header = response.getAsJsonObject("header");
-    JsonElement resultCode = header.get("resultCode");
-    if (resultCode.getAsString().equals("03")) {
+    String resultCode = responseBody.getResponse().getHeader().getResultCode();
+    if (resultCode.equals("03")) {
       return true;
     }
-    JsonObject body = response.getAsJsonObject("body");
-    JsonObject items = body.getAsJsonObject("items");
-    JsonArray item = items.getAsJsonArray("item");
-    for (JsonElement ele : item) {
-      JsonObject obj = ele.getAsJsonObject();
-      JsonElement jsonCategory = obj.get("category");
-      String category = jsonCategory.getAsString();
-      JsonElement forecastDate = obj.get("fcstDate");
-      JsonElement forecastValue = obj.get("fcstValue");
-      JsonElement forecastTime = obj.get("fcstTime");
+
+    List<ShortTermWeatherItem> items = responseBody.getResponse().getBody().getItems().getItem();
+    for (ShortTermWeatherItem item : items) {
+      String category = item.getCategory();
+      String forecastDate = item.getFcstDate();
+      String forecastValue = item.getFcstValue();
+      String forecastTime = item.getFcstTime();
       switch (category) {
         case "TMP": {
           inputTemperatureData(forecastDate, forecastValue, forecastTime, today);
@@ -192,29 +186,26 @@ public class ShortTermWeatherService {
     return false;
   }
 
-  private void inputTemperatureData(JsonElement forecastDate, JsonElement forecastValue,
-      JsonElement forecastTime, DailyShortWeather dailyShortWeather) {
-    if (forecastDate.getAsString().equals(dailyShortWeather.getDate())) {
-      dailyShortWeather.getHourlyTemperature()
-          .put(forecastTime.getAsString(), Integer.parseInt(forecastValue.getAsString()));
+  private void inputTemperatureData(String forecastDate, String forecastValue,
+      String forecastTime, DailyShortWeather dailyShortWeather) {
+    if (forecastDate.equals(dailyShortWeather.getDate())) {
+      dailyShortWeather.getHourlyTemperature().put(forecastTime, Integer.parseInt(forecastValue));
     }
   }
 
-  private void inputSkyStatusData(JsonElement forecastDate, JsonElement forecastValue,
-      JsonElement forecastTime, DailyShortWeather dailyShortWeather) {
-    if (forecastDate.getAsString().equals(dailyShortWeather.getDate())) {
+  private void inputSkyStatusData(String forecastDate, String forecastValue,
+      String forecastTime, DailyShortWeather dailyShortWeather) {
+    if (forecastDate.equals(dailyShortWeather.getDate())) {
       dailyShortWeather.getHourlySkyStatus()
-          .put(forecastTime.getAsString(),
-              SkyCode.findByCode(forecastValue.getAsString()).getSkyStatus());
+          .put(forecastTime, SkyCode.findByCode(forecastValue).getSkyStatus());
     }
   }
 
-  private void inputPrecipitationTypeData(JsonElement forecastDate, JsonElement forecastValue,
-      JsonElement forecastTime, DailyShortWeather dailyShortWeather) {
-    if (forecastDate.getAsString().equals(dailyShortWeather.getDate())) {
-      dailyShortWeather.getHourlyPrecipitationType()
-          .put(forecastTime.getAsString(),
-              PrecipitationTypeCode.findByCode(forecastValue.getAsString()).getPrecipitationType());
+  private void inputPrecipitationTypeData(String forecastDate, String forecastValue,
+      String forecastTime, DailyShortWeather dailyShortWeather) {
+    if (forecastDate.equals(dailyShortWeather.getDate())) {
+      dailyShortWeather.getHourlyPrecipitationType().put(forecastTime,
+          PrecipitationTypeCode.findByCode(forecastValue).getPrecipitationType());
     }
   }
 
