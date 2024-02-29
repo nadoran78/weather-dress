@@ -1,4 +1,4 @@
-package com.fighting.weatherdress.s3.entity;
+package com.fighting.weatherdress.post.entity;
 
 import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.post.entity.Post;

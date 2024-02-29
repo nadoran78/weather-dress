@@ -26,7 +26,10 @@ public enum ErrorCode {
   NEED_TO_SIGNIN(400, "로그인을 해야 합니다."),
 
   // 단기예보 관련
-  NOT_FOUND_LOCATION(500, "일치하는 지역이 없습니다.");
+  NOT_FOUND_LOCATION(500, "일치하는 지역이 없습니다."),
+
+  // S3 관련
+  FAIL_TO_UPLOAD_FILE(500, "파일 업로드가 실패하였습니다.");
 
   private final int status;
   private final String description;

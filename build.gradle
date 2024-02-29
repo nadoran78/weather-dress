@@ -38,7 +38,7 @@ dependencies {
     implementation 'org.thymeleaf:thymeleaf'
 
     // mysql 설정
-    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'com.mysql:mysql-connector-j'
 
     // 필드 유효성 검사를 위한 라이브러리
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
 
     // S3 사용을 위한 의존성 추가
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.268'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

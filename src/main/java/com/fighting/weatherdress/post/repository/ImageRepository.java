@@ -1,6 +1,6 @@
-package com.fighting.weatherdress.s3.repository;
+package com.fighting.weatherdress.post.repository;
 
-import com.fighting.weatherdress.s3.entity.Image;
+import com.fighting.weatherdress.post.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
