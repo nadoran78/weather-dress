@@ -3,6 +3,8 @@ package com.fighting.weatherdress.post.entity;
 import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.member.domain.Member;
+import com.fighting.weatherdress.post.dto.PostRequest;
+import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,4 +58,16 @@ public class Post extends BaseEntity {
   @Builder.Default
   @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Image> images = new ArrayList<>();
+
+  public static Post toEntity(String text, ShortTermWeatherResponse weather, Member member,
+      Location location) {
+    return Post.builder()
+        .text(text)
+        .minTemperature(weather.getToday().getMinTemperature())
+        .maxTemperature(weather.getToday().getMaxTemperature())
+        .likeCount(0L)
+        .member(member)
+        .location(location)
+        .build();
+  }
 }
