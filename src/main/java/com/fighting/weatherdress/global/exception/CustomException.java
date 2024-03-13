@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import lombok.Setter;
 public class CustomException extends RuntimeException {
 
   private ErrorCode errorCode;
-  private int status;
+  private HttpStatus status;
   private String errorMessage;
 
   public CustomException(ErrorCode errorCode) {

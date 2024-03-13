@@ -66,8 +66,8 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.status(500).body(
         CustomErrorResponse.builder()
-            .errorCode(ErrorCode.INTERNAL_SERVER_ERROR)
-            .errorMessage(ErrorCode.INTERNAL_SERVER_ERROR.getDescription())
+            .errorCode(ErrorCode.SERVER_ERROR)
+            .errorMessage(ErrorCode.SERVER_ERROR.getDescription())
             .build());
   }
 }

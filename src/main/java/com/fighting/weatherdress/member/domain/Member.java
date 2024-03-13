@@ -4,12 +4,16 @@ import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.type.Authority;
 import com.fighting.weatherdress.member.domain.converter.RolesConverter;
 import com.fighting.weatherdress.member.dto.SignUpDto;
+import com.fighting.weatherdress.post.entity.Post;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -46,6 +50,10 @@ public class Member extends BaseEntity {
 
   @Convert(converter = RolesConverter.class)
   private List<String> roles;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Post> posts = new ArrayList<>();
 
   public static Member fromDto(SignUpDto request) {
     return Member.builder()
