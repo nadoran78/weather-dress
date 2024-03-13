@@ -6,7 +6,6 @@ import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LOCATION
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.repository.LocationRepository;
-import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
