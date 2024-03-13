@@ -66,6 +66,8 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-impl'
     implementation 'com.sun.xml.bind:jaxb-core'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
+
+    implementation 'org.apache.tika:tika-core:2.9.1'
 }
 
 tasks.named('test') {
