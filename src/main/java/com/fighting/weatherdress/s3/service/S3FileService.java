@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.ErrorCode;
+import com.fighting.weatherdress.post.entity.Image;
 import com.fighting.weatherdress.s3.config.properties.S3Properties;
 import com.fighting.weatherdress.s3.dto.S3FileDto;
 import java.io.IOException;
@@ -33,19 +34,22 @@ public class S3FileService {
           objectMetadata.setContentType(multipartFile.getContentType());
           objectMetadata.setContentLength(multipartFile.getSize());
 
-          String extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
+          String extension = StringUtils.getFilenameExtension(
+              multipartFile.getOriginalFilename());
           String filename = UUID.randomUUID() + "." + extension;
 
           return CompletableFuture.runAsync(() -> {
             try {
               PutObjectRequest putObjectRequest = new PutObjectRequest(
-                  properties.getS3().get("bucket"), filename, multipartFile.getInputStream(),
+                  properties.getS3().get("bucket"), filename,
+                  multipartFile.getInputStream(),
                   objectMetadata);
 
               amazonS3Client.putObject(putObjectRequest);
 
               String objectUrl =
-                  "https://s3.amazonaws.com/" + properties.getS3().get("bucket") + "/" + filename;
+                  "https://s3.amazonaws.com/" + properties.getS3().get("bucket") + "/"
+                      + filename;
               fileDtoList.add(new S3FileDto(objectUrl, filename));
             } catch (IOException e) {
               throw new CustomException(ErrorCode.FAIL_TO_UPLOAD_FILE);
@@ -59,4 +63,10 @@ public class S3FileService {
     return fileDtoList;
   }
 
+  public void deleteImages(List<Image> images) {
+    for (Image image : images) {
+      amazonS3Client.deleteObject(properties.getS3().get("bucket"),
+          StringUtils.getFilename(image.getUrl()));
+    }
+  }
 }

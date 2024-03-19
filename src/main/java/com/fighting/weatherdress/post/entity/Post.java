@@ -59,7 +59,8 @@ public class Post extends BaseEntity {
   @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Image> images = new ArrayList<>();
 
-  public static Post toEntity(String text, ShortTermWeatherResponse weather, Member member,
+  public static Post toEntity(String text, ShortTermWeatherResponse weather,
+      Member member,
       Location location) {
     return Post.builder()
         .text(text)
@@ -69,5 +70,13 @@ public class Post extends BaseEntity {
         .member(member)
         .location(location)
         .build();
+  }
+
+  public void updatePost(String content, ShortTermWeatherResponse weather,
+      Location location) {
+    this.text = content;
+    this.minTemperature = weather.getToday().getMinTemperature();
+    this.maxTemperature = weather.getToday().getMaxTemperature();
+    this.location = location;
   }
 }

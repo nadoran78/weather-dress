@@ -1,11 +1,14 @@
 package com.fighting.weatherdress.post.service;
 
+import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_IS_NOT_WRITER;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LOCATION;
+import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.repository.LocationRepository;
+import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
@@ -50,6 +53,33 @@ public class PostService {
     saveImages(images, savedPost);
 
   }
+
+  public void updatePost(PostRequest request, List<MultipartFile> images, long postId,
+      long memberId) throws URISyntaxException {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+    if (post.getMember().getId() != memberId) {
+      throw new CustomException(MEMBER_IS_NOT_WRITER);
+    }
+
+    Location location = locationRepository.findBySidoAndSigungu(
+            request.getLocation().getSido(), request.getLocation().getSigungu())
+        .orElseThrow(() -> new CustomException(NOT_FOUND_LOCATION));
+    ShortTermWeatherResponse weather = shortTermWeatherService.getWeatherFromApi(
+        request.getLocation().getSido(),
+        request.getLocation().getSigungu());
+
+    post.updatePost(request.getContent(), weather, location);
+
+    List<Image> oldImages = post.getImages();
+    saveImages(images, post);
+    fileService.deleteImages(oldImages);
+    imageRepository.deleteAll(oldImages);
+
+  }
+
+
 
   private void saveImages(List<MultipartFile> images, Post post) {
     fileService.saveFile(images).forEach(s3FileDto -> {

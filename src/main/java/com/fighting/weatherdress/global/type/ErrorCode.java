@@ -37,7 +37,9 @@ public enum ErrorCode {
   // S3 관련
   FAIL_TO_UPLOAD_FILE(INTERNAL_SERVER_ERROR, "파일 업로드가 실패하였습니다."),
 
-  MEMBER_NOT_FOUND(NOT_FOUND, "가입한 멤버가 존재하지 않습니다.")
+  MEMBER_NOT_FOUND(NOT_FOUND, "가입한 멤버가 존재하지 않습니다."),
+  POST_NOT_FOUND(NOT_FOUND, "작성된 게시글이 존재하지 않습니다."),
+  MEMBER_IS_NOT_WRITER(FORBIDDEN, "작성자가 아닙니다.")
 
   ;
 
