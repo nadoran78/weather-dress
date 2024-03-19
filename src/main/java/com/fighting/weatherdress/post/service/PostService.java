@@ -70,6 +70,7 @@ public class PostService {
         request.getLocation().getSigungu());
 
     post.updatePost(request.getContent(), weather, location);
+    postRepository.save(post);
 
     List<Image> oldImages = post.getImages();
     saveImages(images, post);

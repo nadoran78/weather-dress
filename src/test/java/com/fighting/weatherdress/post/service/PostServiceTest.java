@@ -1,9 +1,12 @@
 package com.fighting.weatherdress.post.service;
 
+import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_IS_NOT_WRITER;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LOCATION;
+import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -60,7 +63,7 @@ class PostServiceTest {
   @InjectMocks
   private PostService postService;
 
-  private final PostRequest registerRequest = PostRequest.builder()
+  private final PostRequest request = PostRequest.builder()
       .content("이렇게 입었어요.")
       .location(LocationDto.builder()
           .sido("경기도")
@@ -105,7 +108,7 @@ class PostServiceTest {
     given(postRepository.save(any(Post.class))).will(returnsFirstArg());
     given(fileService.saveFile(any(List.class))).willReturn(s3FileDtos);
     //when
-    postService.registerPost(registerRequest, createImageList(3), 1L);
+    postService.registerPost(request, createImageList(3), 1L);
 
     //then
     ArgumentCaptor<Post> postArgumentCaptor = ArgumentCaptor.forClass(Post.class);
@@ -114,7 +117,7 @@ class PostServiceTest {
     verify(postRepository).save(postArgumentCaptor.capture());
     verify(imageRepository, times(3)).save(imageArgumentCaptor.capture());
 
-    assertEquals(registerRequest.getContent(), postArgumentCaptor.getValue().getText());
+    assertEquals(request.getContent(), postArgumentCaptor.getValue().getText());
     assertEquals("경기도", postArgumentCaptor.getValue().getLocation().getSido());
     assertEquals("군포시", postArgumentCaptor.getValue().getLocation().getSigungu());
     assertEquals(9, postArgumentCaptor.getValue().getMinTemperature());
@@ -139,7 +142,7 @@ class PostServiceTest {
 
     //when
     CustomException customException = assertThrows(CustomException.class,
-        () -> postService.registerPost(registerRequest, createImageList(3), 1L));
+        () -> postService.registerPost(request, createImageList(3), 1L));
 
     //then
     assertEquals(MEMBER_NOT_FOUND, customException.getErrorCode());
@@ -159,7 +162,7 @@ class PostServiceTest {
 
     //when
     CustomException customException = assertThrows(CustomException.class,
-        () -> postService.registerPost(registerRequest, createImageList(3), 1L));
+        () -> postService.registerPost(request, createImageList(3), 1L));
 
     //then
     assertEquals(NOT_FOUND_LOCATION, customException.getErrorCode());
@@ -174,5 +177,131 @@ class PostServiceTest {
     return images;
   }
 
+  @Test
+  void successUpdatePost() throws URISyntaxException, IOException {
+    //given
+    Member member = Member.builder()
+        .id(1L)
+        .build();
+    Post post = Post.builder()
+        .id(14L)
+        .member(member)
+        .build();
+    Location location = Location.builder()
+        .sido("경기도")
+        .sigungu("군포시")
+        .build();
+    DailyShortWeather dailyShortWeather = DailyShortWeather.builder()
+        .date("20240313")
+        .maxTemperature(12)
+        .minTemperature(9)
+        .build();
+    ShortTermWeatherResponse response = ShortTermWeatherResponse.builder()
+        .sido("경기도")
+        .sigungu("군포시")
+        .today(dailyShortWeather)
+        .build();
+    List<S3FileDto> s3FileDtos = new ArrayList<>();
+    for (int i = 1; i <= 3; i++) {
+      S3FileDto s3FileDto = S3FileDto.builder()
+          .url(Integer.toString(i))
+          .build();
+      s3FileDtos.add(s3FileDto);
+    }
 
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(locationRepository.findBySidoAndSigungu(anyString(), anyString()))
+        .willReturn(Optional.of(location));
+    given(shortTermWeatherService.getWeatherFromApi(anyString(), anyString()))
+        .willReturn(response);
+    given(fileService.saveFile(any(List.class))).willReturn(s3FileDtos);
+    //when
+    postService.updatePost(request, createImageList(3), 14L, 1L);
+
+    //then
+    ArgumentCaptor<Post> postArgumentCaptor = ArgumentCaptor.forClass(Post.class);
+    ArgumentCaptor<Image> imageArgumentCaptor = ArgumentCaptor.forClass(Image.class);
+    ArgumentCaptor<List<Image>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+    verify(postRepository).save(postArgumentCaptor.capture());
+    verify(imageRepository, times(3)).save(imageArgumentCaptor.capture());
+    verify(fileService, times(1)).deleteImages(listArgumentCaptor.capture());
+    verify(imageRepository, times(1)).deleteAll(listArgumentCaptor.capture());
+
+    assertEquals(request.getContent(), postArgumentCaptor.getValue().getText());
+    assertEquals("경기도", postArgumentCaptor.getValue().getLocation().getSido());
+    assertEquals("군포시", postArgumentCaptor.getValue().getLocation().getSigungu());
+    assertEquals(9, postArgumentCaptor.getValue().getMinTemperature());
+    assertEquals(12, postArgumentCaptor.getValue().getMaxTemperature());
+
+    assertEquals("1", imageArgumentCaptor.getAllValues().get(0).getUrl());
+    assertEquals("2", imageArgumentCaptor.getAllValues().get(1).getUrl());
+    assertEquals("3", imageArgumentCaptor.getAllValues().get(2).getUrl());
+    assertEquals(postArgumentCaptor.getValue(),
+        imageArgumentCaptor.getAllValues().get(0).getPost());
+    assertEquals(postArgumentCaptor.getValue(),
+        imageArgumentCaptor.getAllValues().get(1).getPost());
+    assertEquals(postArgumentCaptor.getValue(),
+        imageArgumentCaptor.getAllValues().get(2).getPost());
+
+    assertTrue(listArgumentCaptor.getAllValues().get(0).isEmpty());
+    assertTrue(listArgumentCaptor.getAllValues().get(1).isEmpty());
+  }
+
+  @Test
+  void updatePost_shouldThrowPostNotFound_whenPostIsNotExist() {
+    //given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.updatePost(request, createImageList(3), 1L, 1L));
+
+    //then
+    assertEquals(POST_NOT_FOUND, customException.getErrorCode());
+  }
+
+  @Test
+  void updatePost_shouldThrowMemberIsNotWriter_whenMemberIsNotWriter()
+      throws URISyntaxException {
+    //given
+    Member member = Member.builder()
+        .id(1L)
+        .build();
+    Post post = Post.builder()
+        .id(14L)
+        .member(member)
+        .build();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.updatePost(request, createImageList(3), 1L, 3L));
+
+    //then
+    assertEquals(MEMBER_IS_NOT_WRITER, customException.getErrorCode());
+  }
+
+  @Test
+  void updatePost_shouldThrowNotFoundLocation_whenLocationIsNotExist() {
+    //given
+    Member member = Member.builder()
+        .id(1L)
+        .build();
+    Post post = Post.builder()
+        .id(14L)
+        .member(member)
+        .build();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(locationRepository.findBySidoAndSigungu(anyString(), anyString()))
+        .willReturn(Optional.empty());
+
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.updatePost(request, createImageList(3), 1L, 1L));
+
+    //then
+    assertEquals(NOT_FOUND_LOCATION, customException.getErrorCode());
+  }
 }
