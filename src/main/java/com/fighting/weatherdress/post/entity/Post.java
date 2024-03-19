@@ -3,7 +3,6 @@ package com.fighting.weatherdress.post.entity;
 import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.member.domain.Member;
-import com.fighting.weatherdress.post.dto.PostRequest;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
