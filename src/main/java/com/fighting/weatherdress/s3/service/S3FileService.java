@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3FileService {
@@ -65,8 +67,14 @@ public class S3FileService {
 
   public void deleteImages(List<Image> images) {
     for (Image image : images) {
-      amazonS3Client.deleteObject(properties.getS3().get("bucket"),
-          StringUtils.getFilename(image.getUrl()));
+      String filename = StringUtils.getFilename(image.getUrl());
+      boolean isObjectExist = amazonS3Client.doesObjectExist(
+          properties.getS3().get("bucket"), filename);
+      if (isObjectExist) {
+        amazonS3Client.deleteObject(properties.getS3().get("bucket"), filename);
+      } else {
+        log.debug("file to delete not found");
+      }
     }
   }
 }
