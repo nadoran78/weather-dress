@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -35,6 +36,7 @@ public class PostService {
   private final LocationRepository locationRepository;
   private final ImageRepository imageRepository;
 
+  @Transactional
   public void registerPost(PostRequest request, List<MultipartFile> images,
       long memberId) throws URISyntaxException {
     Member member = memberRepository.findById(memberId)
@@ -53,6 +55,7 @@ public class PostService {
 
   }
 
+  @Transactional
   public void updatePost(PostRequest request, List<MultipartFile> images, long postId,
       long memberId) throws URISyntaxException {
     Post post = postRepository.findById(postId)

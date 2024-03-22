@@ -25,15 +25,14 @@ public class PostController {
 
   @PostMapping
   public void registerPost(@Valid @RequestPart PostRequest request,
-      @RequestPart List<MultipartFile> images,
-      @AuthenticationPrincipal CustomUserDetails userDetails) throws URISyntaxException {
+      List<MultipartFile> images, @AuthenticationPrincipal CustomUserDetails userDetails)
+      throws URISyntaxException {
     postService.registerPost(request, images, userDetails.getId());
   }
 
   @PutMapping("/{postId}")
   public void updatePost(@Valid @RequestPart PostRequest request,
-      @RequestPart List<MultipartFile> images,
-      @PathVariable long postId,
+      List<MultipartFile> images, @PathVariable long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails) throws URISyntaxException {
     postService.updatePost(request, images, postId, userDetails.getId());
   }
