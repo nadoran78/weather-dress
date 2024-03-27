@@ -19,6 +19,7 @@ import com.fighting.weatherdress.s3.service.S3FileService;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import com.fighting.weatherdress.weather.service.ShortTermWeatherService;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -72,14 +73,24 @@ public class PostService {
         request.getLocation().getSido(),
         request.getLocation().getSigungu());
 
+    List<Image> oldImages = imageRepository.findAllByPost(post);
+    saveImages(images, post);
+
     post.updatePost(request.getContent(), weather, location);
     postRepository.save(post);
 
-    List<Image> oldImages = post.getImages();
-    saveImages(images, post);
-    fileService.deleteImages(oldImages);
-    imageRepository.deleteAll(oldImages);
+    deleteOldImages(oldImages);
 
+  }
+
+  private void deleteOldImages(List<Image> oldImages) {
+    fileService.deleteImages(oldImages);
+    Iterator<Image> iterator = oldImages.listIterator();
+    while (!iterator.hasNext()) {
+      Image image = iterator.next();
+      image.delete();
+      imageRepository.delete(image);
+    }
   }
 
 
