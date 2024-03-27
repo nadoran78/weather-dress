@@ -37,9 +37,16 @@ public class Image extends BaseEntity {
   private Post post;
 
   public static Image toEntity(String url, Post post) {
-    return Image.builder()
+    Image image = Image.builder()
         .url(url)
         .post(post)
         .build();
+    post.getImages().add(image);
+    return image;
+  }
+
+  public void delete() {
+    this.post.getImages().remove(this);
+    this.post = null;
   }
 }
