@@ -208,6 +208,7 @@ class PostServiceTest {
           .build();
       s3FileDtos.add(s3FileDto);
     }
+    List<Image> images = new ArrayList<>();
 
     given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
     given(locationRepository.findBySidoAndSigungu(anyString(), anyString()))
@@ -215,6 +216,7 @@ class PostServiceTest {
     given(shortTermWeatherService.getWeatherFromApi(anyString(), anyString()))
         .willReturn(response);
     given(fileService.saveFile(any(List.class))).willReturn(s3FileDtos);
+    given(imageRepository.findAllByPost(any(Post.class))).willReturn(images);
     //when
     postService.updatePost(request, createImageList(3), 14L, 1L);
 
