@@ -44,9 +44,4 @@ public class Image extends BaseEntity {
     post.getImages().add(image);
     return image;
   }
-
-  public void delete() {
-    this.post.getImages().remove(this);
-    this.post = null;
-  }
 }
