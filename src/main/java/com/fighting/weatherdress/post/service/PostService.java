@@ -85,12 +85,7 @@ public class PostService {
 
   private void deleteOldImages(List<Image> oldImages) {
     fileService.deleteImages(oldImages);
-    Iterator<Image> iterator = oldImages.listIterator();
-    while (!iterator.hasNext()) {
-      Image image = iterator.next();
-      image.delete();
-      imageRepository.delete(image);
-    }
+    imageRepository.deleteAll(oldImages);
   }
 
 
