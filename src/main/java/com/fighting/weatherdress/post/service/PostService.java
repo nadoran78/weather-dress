@@ -24,6 +24,10 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,5 +110,11 @@ public class PostService {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     return PostResponse.fromEntity(post);
+  }
+
+  public Slice<PostResponse> getPostList(Pageable pageable) {
+    List<PostResponse> postResponseList = postRepository.findAll(pageable).stream()
+        .map(PostResponse::fromEntity).toList();
+    return new SliceImpl<>(postResponseList);
   }
 }
