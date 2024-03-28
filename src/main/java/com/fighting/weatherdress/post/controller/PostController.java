@@ -8,7 +8,9 @@ import java.net.URISyntaxException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +25,16 @@ public class PostController {
 
   @PostMapping
   public void registerPost(@Valid @RequestPart PostRequest request,
-      @RequestPart List<MultipartFile> images,
-      @AuthenticationPrincipal CustomUserDetails userDetails) throws URISyntaxException {
+      List<MultipartFile> images, @AuthenticationPrincipal CustomUserDetails userDetails)
+      throws URISyntaxException {
     postService.registerPost(request, images, userDetails.getId());
+  }
+
+  @PutMapping("/{postId}")
+  public void updatePost(@Valid @RequestPart PostRequest request,
+      List<MultipartFile> images, @PathVariable long postId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) throws URISyntaxException {
+    postService.updatePost(request, images, postId, userDetails.getId());
   }
 
 }

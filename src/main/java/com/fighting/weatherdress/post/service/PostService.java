@@ -1,7 +1,9 @@
 package com.fighting.weatherdress.post.service;
 
+import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_IS_NOT_WRITER;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LOCATION;
+import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.global.exception.CustomException;
@@ -17,9 +19,11 @@ import com.fighting.weatherdress.s3.service.S3FileService;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import com.fighting.weatherdress.weather.service.ShortTermWeatherService;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -33,6 +37,7 @@ public class PostService {
   private final LocationRepository locationRepository;
   private final ImageRepository imageRepository;
 
+  @Transactional
   public void registerPost(PostRequest request, List<MultipartFile> images,
       long memberId) throws URISyntaxException {
     Member member = memberRepository.findById(memberId)
@@ -50,6 +55,40 @@ public class PostService {
     saveImages(images, savedPost);
 
   }
+
+  @Transactional
+  public void updatePost(PostRequest request, List<MultipartFile> images, long postId,
+      long memberId) throws URISyntaxException {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+    if (post.getMember().getId() != memberId) {
+      throw new CustomException(MEMBER_IS_NOT_WRITER);
+    }
+
+    Location location = locationRepository.findBySidoAndSigungu(
+            request.getLocation().getSido(), request.getLocation().getSigungu())
+        .orElseThrow(() -> new CustomException(NOT_FOUND_LOCATION));
+    ShortTermWeatherResponse weather = shortTermWeatherService.getWeatherFromApi(
+        request.getLocation().getSido(),
+        request.getLocation().getSigungu());
+
+    List<Image> oldImages = imageRepository.findAllByPost(post);
+    saveImages(images, post);
+
+    post.updatePost(request.getContent(), weather, location);
+    postRepository.save(post);
+
+    deleteOldImages(oldImages);
+
+  }
+
+  private void deleteOldImages(List<Image> oldImages) {
+    fileService.deleteImages(oldImages);
+    imageRepository.deleteAll(oldImages);
+  }
+
+
 
   private void saveImages(List<MultipartFile> images, Post post) {
     fileService.saveFile(images).forEach(s3FileDto -> {
