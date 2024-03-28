@@ -1,6 +1,7 @@
 package com.fighting.weatherdress.post.controller;
 
 import com.fighting.weatherdress.post.dto.PostRequest;
+import com.fighting.weatherdress.post.dto.PostResponse;
 import com.fighting.weatherdress.post.service.PostService;
 import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +37,11 @@ public class PostController {
       List<MultipartFile> images, @PathVariable long postId,
       @AuthenticationPrincipal CustomUserDetails userDetails) throws URISyntaxException {
     postService.updatePost(request, images, postId, userDetails.getId());
+  }
+
+  @GetMapping("/{postId}")
+  public PostResponse getPost(@PathVariable long postId) {
+    return postService.getPost(postId);
   }
 
 }
