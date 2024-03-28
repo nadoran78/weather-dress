@@ -8,9 +8,11 @@ import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.repository.LocationRepository;
+import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
+import com.fighting.weatherdress.post.dto.PostResponse;
 import com.fighting.weatherdress.post.entity.Image;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.ImageRepository;
@@ -93,8 +95,6 @@ public class PostService {
     }
   }
 
-
-
   private void saveImages(List<MultipartFile> images, Post post) {
     fileService.saveFile(images).forEach(s3FileDto -> {
       Image image = Image.toEntity(s3FileDto.getUrl(), post);
@@ -102,4 +102,9 @@ public class PostService {
     });
   }
 
+  public PostResponse getPost(long postId) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+    return PostResponse.fromEntity(post);
+  }
 }
