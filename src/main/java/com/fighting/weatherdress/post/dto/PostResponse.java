@@ -23,6 +23,8 @@ public class PostResponse {
 
   private final Integer maxTemperature;
 
+  private final Integer averageTemperature;
+
   private final Long likeCount;
 
   private final MemberInfoDto member;
@@ -32,11 +34,13 @@ public class PostResponse {
   private final List<String> imageUrls;
 
   public static PostResponse fromEntity(Post post) {
+    int averageTemperature = (post.getMaxTemperature() + post.getMinTemperature()) / 2;
     return PostResponse.builder()
         .id(post.getId())
         .text(post.getText())
         .minTemperature(post.getMinTemperature())
         .maxTemperature(post.getMaxTemperature())
+        .averageTemperature(averageTemperature)
         .likeCount(post.getLikeCount())
         .member(MemberInfoDto.fromEntity(post.getMember()))
         .location(LocationDto.builder()
