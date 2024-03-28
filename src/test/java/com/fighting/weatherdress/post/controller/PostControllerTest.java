@@ -1,6 +1,7 @@
 package com.fighting.weatherdress.post.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -27,6 +28,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -226,5 +231,23 @@ class PostControllerTest {
             .contentType(APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value("1"))
         .andExpect(jsonPath("$.text").value(response.getText()));
+  }
+
+  @Test
+  @WithMockUser
+  void successGetPostList() throws Exception {
+    //given
+    PostResponse response = PostResponse.builder()
+        .id(1L)
+        .text("이렇게 입었어요.")
+        .build();
+    Slice<PostResponse> responseSlice = new SliceImpl<>(List.of(response));
+    given(postService.getPostList(any(Pageable.class))).willReturn(responseSlice);
+    //when & then
+    mockMvc.perform(get("/post/list")
+            .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(jsonPath("$.content[0].id").value("1"))
+        .andExpect(jsonPath("$.content[0].text").value(response.getText()));
   }
 }

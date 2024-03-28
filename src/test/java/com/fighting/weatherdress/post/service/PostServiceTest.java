@@ -43,6 +43,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.web.multipart.MultipartFile;
 import util.MockDataUtil;
 
@@ -355,5 +361,61 @@ class PostServiceTest {
         () -> postService.getPost(1L));
     //then
     assertEquals(POST_NOT_FOUND, customException.getErrorCode());
+  }
+
+  @Test
+  void successGetPostList() {
+    // given
+    List<Image> images = List.of(Image.builder()
+        .url("123455")
+        .build());
+    Post post = Post.builder()
+        .id(1L)
+        .text("맛있습니다")
+        .minTemperature(1)
+        .maxTemperature(8)
+        .likeCount(139123L)
+        .member(Member.builder()
+            .id(3L)
+            .email("test@email")
+            .nickName("귀요미")
+            .build())
+        .location(Location.builder()
+            .sido("경기")
+            .sigungu("군포시")
+            .build())
+        .images(images)
+        .build();
+    List<Post> postList = List.of(post);
+    Page<Post> result = new PageImpl<>(postList);
+    given(postRepository.findAll(any(Pageable.class))).willReturn(result);
+
+    // when
+    PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
+    Slice<PostResponse> responseSlice = postService.getPostList(pageRequest);
+
+    // then
+    assertEquals(responseSlice.getContent().size(), postList.size());
+    assertEquals(responseSlice.getContent().get(0).getId(), post.getId());
+    assertEquals(responseSlice.getContent().get(0).getText(), post.getText());
+    assertEquals(responseSlice.getContent().get(0).getMinTemperature(),
+        post.getMinTemperature());
+    assertEquals(responseSlice.getContent().get(0).getMaxTemperature(),
+        post.getMaxTemperature());
+    assertEquals(responseSlice.getContent().get(0).getLikeCount(), post.getLikeCount());
+    assertEquals(responseSlice.getContent().get(0).getMember().getId(),
+        post.getMember().getId());
+    assertEquals(responseSlice.getContent().get(0).getMember().getEmail(),
+        post.getMember().getEmail());
+    assertEquals(responseSlice.getContent().get(0).getMember().getNickName(),
+        post.getMember().getNickName());
+    assertEquals(responseSlice.getContent().get(0).getLocation().getSido(),
+        post.getLocation().getSido());
+    assertEquals(responseSlice.getContent().get(0).getLocation().getSigungu(),
+        post.getLocation().getSigungu());
+    assertEquals(responseSlice.getContent().get(0).getImageUrls().size(),
+        post.getImages().size());
+    assertEquals(responseSlice.getContent().get(0).getImageUrls().get(0),
+        post.getImages().get(0).getUrl());
   }
 }
