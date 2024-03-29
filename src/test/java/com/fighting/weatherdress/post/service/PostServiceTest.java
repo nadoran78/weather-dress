@@ -21,6 +21,7 @@ import com.fighting.weatherdress.global.repository.LocationRepository;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
+import com.fighting.weatherdress.post.dto.PostResponse;
 import com.fighting.weatherdress.post.entity.Image;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.ImageRepository;
@@ -264,8 +265,7 @@ class PostServiceTest {
   }
 
   @Test
-  void updatePost_shouldThrowMemberIsNotWriter_whenMemberIsNotWriter()
-      throws URISyntaxException {
+  void updatePost_shouldThrowMemberIsNotWriter_whenMemberIsNotWriter() {
     //given
     Member member = Member.builder()
         .id(1L)
@@ -305,5 +305,57 @@ class PostServiceTest {
 
     //then
     assertEquals(NOT_FOUND_LOCATION, customException.getErrorCode());
+  }
+
+  @Test
+  void successGetPost() {
+    //given
+    List<Image> images = List.of(Image.builder()
+        .url("123455")
+        .build());
+    Post post = Post.builder()
+        .id(1L)
+        .text("맛있습니다")
+        .minTemperature(1)
+        .maxTemperature(8)
+        .likeCount(139123L)
+        .member(Member.builder()
+            .id(3L)
+            .email("test@email")
+            .nickName("귀요미")
+            .build())
+        .location(Location.builder()
+            .sido("경기")
+            .sigungu("군포시")
+            .build())
+        .images(images)
+        .build();
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    //when
+    PostResponse response = postService.getPost(1L);
+    //then
+    assertEquals(post.getId(), response.getId());
+    assertEquals(post.getText(), response.getText());
+    assertEquals(post.getMinTemperature(), response.getMinTemperature());
+    assertEquals(post.getMaxTemperature(), response.getMaxTemperature());
+    assertEquals(post.getLikeCount(), response.getLikeCount());
+    assertEquals(post.getMember().getId(), response.getMember().getId());
+    assertEquals(post.getMember().getEmail(), response.getMember().getEmail());
+    assertEquals(post.getMember().getNickName(), response.getMember().getNickName());
+    assertEquals(post.getLocation().getSido(), response.getLocation().getSido());
+    assertEquals(post.getLocation().getSigungu(), response.getLocation().getSigungu());
+    assertEquals(post.getImages().size(), response.getImageUrls().size());
+    assertEquals(post.getImages().get(0).getUrl(), response.getImageUrls().get(0));
+  }
+
+  @Test
+  void getPost_shouldThrowPostNotFound_whenPostIsNotExist() {
+    //given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.getPost(1L));
+    //then
+    assertEquals(POST_NOT_FOUND, customException.getErrorCode());
   }
 }

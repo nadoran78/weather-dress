@@ -1,21 +1,24 @@
 package com.fighting.weatherdress.post.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.post.dto.PostRequest;
+import com.fighting.weatherdress.post.dto.PostResponse;
 import com.fighting.weatherdress.post.service.PostService;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import com.fighting.weatherdress.weather.dto.LocationDto;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,6 +28,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -206,5 +210,21 @@ class PostControllerTest {
         .andExpect(jsonPath("$.location").exists())
         .andExpect(jsonPath("$.content").exists());
 
+  }
+
+  @Test
+  @WithMockUser
+  void successGetPost() throws Exception {
+    //given
+    PostResponse response = PostResponse.builder()
+        .id(1L)
+        .text("이렇게 입었어요.")
+        .build();
+    given(postService.getPost(anyLong())).willReturn(response);
+    //when & then
+    mockMvc.perform(get("/post/1")
+            .contentType(APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value("1"))
+        .andExpect(jsonPath("$.text").value(response.getText()));
   }
 }
