@@ -8,7 +8,6 @@ import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 import com.fighting.weatherdress.global.entity.Location;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.repository.LocationRepository;
-import com.fighting.weatherdress.global.type.ErrorCode;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
@@ -21,10 +20,8 @@ import com.fighting.weatherdress.s3.service.S3FileService;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import com.fighting.weatherdress.weather.service.ShortTermWeatherService;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -111,5 +108,20 @@ public class PostService {
     List<PostResponse> postResponseList = postRepository.findAll(pageable).stream()
         .map(PostResponse::fromEntity).toList();
     return new SliceImpl<>(postResponseList);
+  }
+
+  @Transactional
+  public void deletePost(long postId, long memberId) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+    if (post.getMember().getId() != memberId) {
+      throw new CustomException(MEMBER_IS_NOT_WRITER);
+    }
+
+    List<Image> imageList = post.getImages();
+    fileService.deleteImages(imageList);
+
+    postRepository.delete(post);
   }
 }
