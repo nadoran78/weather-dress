@@ -420,4 +420,59 @@ class PostServiceTest {
     assertEquals(responseSlice.getContent().get(0).getImageUrls().get(0),
         post.getImages().get(0).getUrl());
   }
+
+  @Test
+  void successDeletePost() {
+    //given
+    Member member = Member.builder()
+        .id(4L)
+        .build();
+    Post post = Post.builder()
+        .id(3L)
+        .member(member)
+        .build();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    //when
+    postService.deletePost(3L, 4L);
+    //then
+    ArgumentCaptor<List<Image>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    ArgumentCaptor<Post> postArgumentCaptor = ArgumentCaptor.forClass(Post.class);
+
+    verify(fileService).deleteImages(listArgumentCaptor.capture());
+    verify(postRepository).delete(postArgumentCaptor.capture());
+
+    assertTrue(listArgumentCaptor.getValue().isEmpty());
+    assertEquals(post.getId(), postArgumentCaptor.getValue().getId());
+  }
+
+  @Test
+  void deletePost_shouldThrowPostNotFound_whenPostIsNotExist() {
+    //given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.deletePost(3L, 4L));
+    //then
+    assertEquals(POST_NOT_FOUND, customException.getErrorCode());
+  }
+
+  @Test
+  void deletePost_shouldThrowMemberIsNotWriter_whenRequestMemberIsNotWriter() {
+    //given
+    Member member = Member.builder()
+        .id(4L)
+        .build();
+    Post post = Post.builder()
+        .id(3L)
+        .member(member)
+        .build();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> postService.deletePost(3L, 2L));
+    //then
+    assertEquals(MEMBER_IS_NOT_WRITER, customException.getErrorCode());
+  }
 }
