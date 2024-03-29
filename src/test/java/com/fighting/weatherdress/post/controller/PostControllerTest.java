@@ -9,6 +9,7 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,7 +29,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -249,5 +249,22 @@ class PostControllerTest {
         .andDo(print())
         .andExpect(jsonPath("$.content[0].id").value("1"))
         .andExpect(jsonPath("$.content[0].text").value(response.getText()));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void successDeletePost() throws Exception {
+    //when
+    mockMvc.perform(delete("/post/4")
+            .contentType(APPLICATION_JSON)
+            .with(csrf()))
+        .andExpect(status().isOk());
+
+    ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+    verify(postService).deletePost(longArgumentCaptor.capture(),
+        longArgumentCaptor.capture());
+    //then
+    assertEquals(4, longArgumentCaptor.getAllValues().get(0));
+    assertEquals(1, longArgumentCaptor.getAllValues().get(1));
   }
 }
