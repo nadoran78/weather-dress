@@ -1,6 +1,6 @@
 package com.fighting.weatherdress.post.dto;
 
-import com.fighting.weatherdress.post.entity.Image;
+import com.fighting.weatherdress.image.entity.Image;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.security.dto.MemberInfoDto;
 import com.fighting.weatherdress.weather.dto.LocationDto;

@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fighting.weatherdress.global.exception.CustomException;
 import com.fighting.weatherdress.global.type.ErrorCode;
-import com.fighting.weatherdress.post.entity.Image;
+import com.fighting.weatherdress.image.entity.Image;
 import com.fighting.weatherdress.s3.config.properties.S3Properties;
 import com.fighting.weatherdress.s3.dto.S3FileDto;
 import java.io.IOException;

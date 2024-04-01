@@ -12,7 +12,7 @@ import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.dto.PostRequest;
 import com.fighting.weatherdress.post.dto.PostResponse;
-import com.fighting.weatherdress.post.entity.Image;
+import com.fighting.weatherdress.image.entity.Image;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.ImageRepository;
 import com.fighting.weatherdress.post.repository.PostRepository;
