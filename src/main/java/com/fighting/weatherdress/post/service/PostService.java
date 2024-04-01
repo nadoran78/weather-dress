@@ -101,12 +101,16 @@ public class PostService {
   public PostResponse getPost(long postId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
-    return PostResponse.fromEntity(post);
+    List<Image> images = imageRepository.findAllByPost(post);
+    return PostResponse.fromEntity(post, images);
   }
 
   public Slice<PostResponse> getPostList(Pageable pageable) {
     List<PostResponse> postResponseList = postRepository.findAll(pageable).stream()
-        .map(PostResponse::fromEntity).toList();
+        .map(post -> {
+          List<Image> images = imageRepository.findAllByPost(post);
+          return PostResponse.fromEntity(post, images);
+        }).toList();
     return new SliceImpl<>(postResponseList);
   }
 
@@ -119,8 +123,9 @@ public class PostService {
       throw new CustomException(MEMBER_IS_NOT_WRITER);
     }
 
-    List<Image> imageList = post.getImages();
+    List<Image> imageList = imageRepository.findAllByPost(post);
     fileService.deleteImages(imageList);
+    imageRepository.deleteAll(imageList);
 
     postRepository.delete(post);
   }
