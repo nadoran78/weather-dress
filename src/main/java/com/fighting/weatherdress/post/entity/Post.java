@@ -54,10 +54,6 @@ public class Post extends BaseEntity {
   @JoinColumn(name = "location_id")
   private Location location;
 
-  @Builder.Default
-  @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Image> images = new ArrayList<>();
-
   public static Post toEntity(String text, ShortTermWeatherResponse weather,
       Member member,
       Location location) {

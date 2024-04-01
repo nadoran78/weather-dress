@@ -31,7 +31,7 @@ public class PostResponse {
 
   private final List<String> imageUrls;
 
-  public static PostResponse fromEntity(Post post) {
+  public static PostResponse fromEntity(Post post, List<Image> images) {
     return PostResponse.builder()
         .id(post.getId())
         .text(post.getText())
@@ -43,7 +43,7 @@ public class PostResponse {
             .sido(post.getLocation().getSido())
             .sigungu(post.getLocation().getSigungu())
             .build())
-        .imageUrls(getImages(post.getImages()))
+        .imageUrls(getImages(images))
         .build();
   }
 
