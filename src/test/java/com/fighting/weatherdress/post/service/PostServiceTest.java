@@ -334,9 +334,9 @@ class PostServiceTest {
             .sido("경기")
             .sigungu("군포시")
             .build())
-        .images(images)
         .build();
     given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(imageRepository.findAllByPost(post)).willReturn(images);
     //when
     PostResponse response = postService.getPost(1L);
     //then
@@ -350,8 +350,8 @@ class PostServiceTest {
     assertEquals(post.getMember().getNickName(), response.getMember().getNickName());
     assertEquals(post.getLocation().getSido(), response.getLocation().getSido());
     assertEquals(post.getLocation().getSigungu(), response.getLocation().getSigungu());
-    assertEquals(post.getImages().size(), response.getImageUrls().size());
-    assertEquals(post.getImages().get(0).getUrl(), response.getImageUrls().get(0));
+    assertEquals(images.size(), response.getImageUrls().size());
+    assertEquals(images.get(0).getUrl(), response.getImageUrls().get(0));
   }
 
   @Test
@@ -386,11 +386,11 @@ class PostServiceTest {
             .sido("경기")
             .sigungu("군포시")
             .build())
-        .images(images)
         .build();
     List<Post> postList = List.of(post);
     Page<Post> result = new PageImpl<>(postList);
     given(postRepository.findAll(any(Pageable.class))).willReturn(result);
+    given(imageRepository.findAllByPost(post)).willReturn(images);
 
     // when
     PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
@@ -416,9 +416,9 @@ class PostServiceTest {
     assertEquals(responseSlice.getContent().get(0).getLocation().getSigungu(),
         post.getLocation().getSigungu());
     assertEquals(responseSlice.getContent().get(0).getImageUrls().size(),
-        post.getImages().size());
+        images.size());
     assertEquals(responseSlice.getContent().get(0).getImageUrls().get(0),
-        post.getImages().get(0).getUrl());
+        images.get(0).getUrl());
   }
 
   @Test
