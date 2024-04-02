@@ -1,11 +1,14 @@
 package com.fighting.weatherdress.reply.controller;
 
 import com.fighting.weatherdress.reply.dto.ReplyRequest;
+import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.service.ReplyService;
 import com.fighting.weatherdress.security.dto.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,11 @@ public class ReplyController {
   public void registerReply(@Valid @RequestBody ReplyRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     replyService.registerReply(request, userDetails.getId());
+  }
+
+  @GetMapping("/{replyId}")
+  public ReplyResponse getReply(@PathVariable long replyId) {
+    return replyService.getReply(replyId);
   }
 
 }
