@@ -1,6 +1,6 @@
 package com.fighting.weatherdress.post.repository;
 
-import com.fighting.weatherdress.post.entity.Image;
+import com.fighting.weatherdress.image.entity.Image;
 import com.fighting.weatherdress.post.entity.Post;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
