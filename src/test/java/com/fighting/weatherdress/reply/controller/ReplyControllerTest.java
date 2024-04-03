@@ -1,9 +1,12 @@
 package com.fighting.weatherdress.reply.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,8 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.reply.dto.ReplyRequest;
+import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.service.ReplyService;
+import com.fighting.weatherdress.security.dto.MemberInfoDto;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = ReplyController.class, excludeFilters = {
@@ -78,6 +85,39 @@ class ReplyControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.text").value("size must be between 0 and 100"));
 
+  }
+
+  @Test
+  @WithMockUser
+  void successGetReply() throws Exception {
+    //given
+    LocalDateTime now = LocalDateTime.now();
+    ReplyResponse response = ReplyResponse.builder()
+        .replyId(12L)
+        .member(MemberInfoDto.builder()
+            .id(1L)
+            .email("test@test.com")
+            .nickName("귀여워")
+            .build())
+        .text("멋져요")
+        .postId(13L)
+        .createdAt(now)
+        .build();
+
+    given(replyService.getReply(anyLong())).willReturn(response);
+    //when & then
+    mockMvc.perform(get("/reply/12")
+            .with(csrf()))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.replyId").value(response.getReplyId()))
+        .andExpect(jsonPath("$.text").value(response.getText()))
+        .andExpect(jsonPath("$.member.id").value(response.getMember().getId()))
+        .andExpect(jsonPath("$.member.email").value(response.getMember().getEmail()))
+        .andExpect(
+            jsonPath("$.member.nickName").value(response.getMember().getNickName()))
+        .andExpect(jsonPath("$.postId").value(response.getPostId()))
+        .andExpect(jsonPath("$.createdAt").value(now.toString()));
   }
 
 }
