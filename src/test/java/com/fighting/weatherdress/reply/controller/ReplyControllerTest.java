@@ -1,6 +1,7 @@
 package com.fighting.weatherdress.reply.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -13,12 +14,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
+import com.fighting.weatherdress.reply.dto.ReplyListDto;
 import com.fighting.weatherdress.reply.dto.ReplyRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.service.ReplyService;
 import com.fighting.weatherdress.security.dto.MemberInfoDto;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -118,6 +124,54 @@ class ReplyControllerTest {
             jsonPath("$.member.nickName").value(response.getMember().getNickName()))
         .andExpect(jsonPath("$.postId").value(response.getPostId()))
         .andExpect(jsonPath("$.createdAt").value(now.toString()));
+  }
+
+  @Test
+  @WithMockUser
+  void successGetReplyList() throws Exception {
+    //given
+    List<ReplyListDto> replyListDtos = new ArrayList<>();
+    LocalDateTime now = LocalDateTime.now();
+    for (int i = 1; i <= 3; i++) {
+      replyListDtos.add(ReplyListDto.builder()
+          .replyId(i)
+          .text("멋져요" + i)
+          .memberNickname("닉네임" + i)
+          .createdAt(now.minusDays(i))
+          .build());
+    }
+
+    given(replyService.getReplyList(anyLong(), any(PageRequest.class))).willReturn(
+        new SliceImpl<>(replyListDtos));
+    //when & then
+    mockMvc.perform(get("/reply/list/1")
+            .with(csrf()))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.content[0].replyId").value(replyListDtos.get(0).getReplyId()))
+        .andExpect(jsonPath("$.content[0].text").value(replyListDtos.get(0).getText()))
+        .andExpect(jsonPath("$.content[0].memberNickname").value(
+            replyListDtos.get(0).getMemberNickname()))
+        .andExpect(
+            jsonPath("$.content[0].createdAt").value(
+                replyListDtos.get(0).getCreatedAt().toString()))
+        .andExpect(
+            jsonPath("$.content[1].replyId").value(replyListDtos.get(1).getReplyId()))
+        .andExpect(jsonPath("$.content[1].text").value(replyListDtos.get(1).getText()))
+        .andExpect(jsonPath("$.content[1].memberNickname").value(
+            replyListDtos.get(1).getMemberNickname()))
+        .andExpect(
+            jsonPath("$.content[1].createdAt").value(
+                replyListDtos.get(1).getCreatedAt().toString()))
+        .andExpect(
+            jsonPath("$.content[2].replyId").value(replyListDtos.get(2).getReplyId()))
+        .andExpect(jsonPath("$.content[2].text").value(replyListDtos.get(2).getText()))
+        .andExpect(jsonPath("$.content[2].memberNickname").value(
+            replyListDtos.get(2).getMemberNickname()))
+        .andExpect(
+            jsonPath("$.content[2].createdAt").value(
+                replyListDtos.get(2).getCreatedAt().toString()));
   }
 
 }

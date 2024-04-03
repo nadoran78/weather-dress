@@ -9,11 +9,16 @@ import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.PostRepository;
+import com.fighting.weatherdress.reply.dto.ReplyListDto;
 import com.fighting.weatherdress.reply.dto.ReplyRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.entity.Reply;
 import com.fighting.weatherdress.reply.repository.ReplyRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,6 +49,16 @@ public class ReplyService {
         .orElseThrow(() -> new CustomException(NOT_FOUND_REPLY));
 
     return ReplyResponse.fromEntity(reply);
+  }
+
+  public Slice<ReplyListDto> getReplyList(long postId, Pageable pageable) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+    List<ReplyListDto> replyListDtos = replyRepository.findAllByPost(post, pageable).stream()
+        .map(ReplyListDto::fromEntity).toList();
+
+    return new SliceImpl<>(replyListDtos);
   }
 
 }

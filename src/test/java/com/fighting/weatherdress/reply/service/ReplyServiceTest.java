@@ -5,6 +5,8 @@ import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
 import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.spy;
@@ -15,11 +17,14 @@ import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.PostRepository;
+import com.fighting.weatherdress.reply.dto.ReplyListDto;
 import com.fighting.weatherdress.reply.dto.ReplyRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.entity.Reply;
 import com.fighting.weatherdress.reply.repository.ReplyRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +32,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort.Direction;
 
 @ExtendWith(MockitoExtension.class)
 class ReplyServiceTest {
@@ -149,5 +157,87 @@ class ReplyServiceTest {
         () -> replyService.getReply(12L));
     //then
     assertEquals(NOT_FOUND_REPLY, customException.getErrorCode());
+  }
+
+  @Test
+  void successGetReplyList() {
+    //given
+    Post post = Post.builder()
+        .id(1L)
+        .member(Member.builder()
+            .nickName("닉네임")
+            .build())
+        .build();
+    Reply reply1 = spy(Reply.builder()
+        .text("멋져요1")
+        .member(post.getMember())
+        .build());
+    Reply reply2 = spy(Reply.builder()
+        .text("멋져요2")
+        .member(post.getMember())
+        .build());
+    List<Reply> replies = List.of(reply1, reply2);
+    LocalDateTime now = LocalDateTime.now();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(replyRepository.findAllByPost(any(Post.class), any(PageRequest.class)))
+        .willReturn(replies);
+    given(reply1.getId()).willReturn(1L);
+    given(reply2.getId()).willReturn(2L);
+    given(reply1.getCreatedAt()).willReturn(now);
+    given(reply2.getCreatedAt()).willReturn(now);
+
+    //when
+    PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
+
+    Slice<ReplyListDto> replyList = replyService.getReplyList(12L, pageRequest);
+    //then
+    List<ReplyListDto> content = replyList.getContent();
+
+    assertEquals(1L, content.get(0).getReplyId());
+    assertEquals(reply1.getText(), content.get(0).getText());
+    assertEquals(reply1.getMember().getNickName(), content.get(0).getMemberNickname());
+    assertEquals(now, content.get(0).getCreatedAt());
+    assertEquals(2L, content.get(1).getReplyId());
+    assertEquals(reply2.getText(), content.get(1).getText());
+    assertEquals(reply2.getMember().getNickName(), content.get(1).getMemberNickname());
+    assertEquals(now, content.get(1).getCreatedAt());
+  }
+
+  @Test
+  void getReplyList_shouldThrowPostNotFound_whenPostIsNotExist() {
+    //given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    //when
+    PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
+
+    CustomException customException = assertThrows(CustomException.class,
+        () -> replyService.getReplyList(12L, pageRequest));
+    //then
+    assertEquals(POST_NOT_FOUND, customException.getErrorCode());
+  }
+
+  @Test
+  void getReplyList_shouldThrowResponseListIsEmpty_whenReplyIsNotExist() {
+    //given
+    Post post = Post.builder()
+        .id(1L)
+        .member(Member.builder()
+            .nickName("닉네임")
+            .build())
+        .build();
+    List<Reply> replies = new ArrayList<>();
+
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(replyRepository.findAllByPost(any(Post.class), any(PageRequest.class)))
+        .willReturn(replies);
+
+    //when
+    PageRequest pageRequest = PageRequest.of(0, 10, Direction.DESC, "createdAt");
+
+    Slice<ReplyListDto> replyList = replyService.getReplyList(12L, pageRequest);
+    //then
+    assertTrue(replyList.isEmpty());
   }
 }
