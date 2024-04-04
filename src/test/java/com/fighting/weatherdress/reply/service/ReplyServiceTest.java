@@ -18,7 +18,7 @@ import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.PostRepository;
 import com.fighting.weatherdress.reply.dto.ReplyListDto;
-import com.fighting.weatherdress.reply.dto.ReplyRequest;
+import com.fighting.weatherdress.reply.dto.ReplyRegisterRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.entity.Reply;
 import com.fighting.weatherdress.reply.repository.ReplyRepository;
@@ -51,7 +51,7 @@ class ReplyServiceTest {
   @Test
   void successRegisterReply() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();
@@ -81,7 +81,7 @@ class ReplyServiceTest {
   @Test
   void registerReply_shouldThrowMemberNotFound_whenMemberIsNotExist() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();
@@ -97,7 +97,7 @@ class ReplyServiceTest {
   @Test
   void registerReply_shouldThrowPostNotFound_whenPostIsNotExist() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();

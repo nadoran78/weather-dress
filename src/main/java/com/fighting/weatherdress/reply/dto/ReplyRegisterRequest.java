@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @EqualsAndHashCode
-public class ReplyRequest {
+public class ReplyRegisterRequest {
 
   private final long postId;
 

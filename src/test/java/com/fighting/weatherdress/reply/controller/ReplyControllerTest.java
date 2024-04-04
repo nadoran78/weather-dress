@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.reply.dto.ReplyListDto;
-import com.fighting.weatherdress.reply.dto.ReplyRequest;
+import com.fighting.weatherdress.reply.dto.ReplyRegisterRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
 import com.fighting.weatherdress.reply.service.ReplyService;
 import com.fighting.weatherdress.security.dto.MemberInfoDto;
@@ -50,7 +50,7 @@ class ReplyControllerTest {
   @WithMockCustomUser
   void successRegisterReply() throws Exception {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(1L)
         .text("잘 봤습니다.")
         .build();
@@ -62,8 +62,8 @@ class ReplyControllerTest {
         .andDo(print())
         .andExpect(status().isOk());
     //then
-    ArgumentCaptor<ReplyRequest> requestArgumentCaptor = ArgumentCaptor.forClass(
-        ReplyRequest.class);
+    ArgumentCaptor<ReplyRegisterRequest> requestArgumentCaptor = ArgumentCaptor.forClass(
+        ReplyRegisterRequest.class);
     ArgumentCaptor<Long> longArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
     verify(replyService).registerReply(requestArgumentCaptor.capture(),
@@ -78,7 +78,7 @@ class ReplyControllerTest {
   @WithMockCustomUser
   void registerReply_shouldThrowInvalidRequest_whenTextSizeIsOver100() throws Exception {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(1L)
         .text("1".repeat(101))
         .build();
