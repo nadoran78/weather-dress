@@ -51,7 +51,7 @@ public class ReplyController {
 
   @PatchMapping("/{replyId}")
   public ReplyResponse updateReply(@PathVariable long replyId,
-      @RequestBody ReplyUpdateRequest request,
+      @Valid @RequestBody ReplyUpdateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return replyService.updateReply(replyId, request, userDetails.getId());
   }
