@@ -11,6 +11,7 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -314,7 +315,7 @@ class ReplyServiceTest {
         .member(member)
         .post(post)
         .build());
-    
+
     ReplyUpdateRequest request = ReplyUpdateRequest.builder()
         .text("수정했습니다.")
         .build();
@@ -325,6 +326,54 @@ class ReplyServiceTest {
     CustomException customException = assertThrows(CustomException.class,
         () -> replyService.updateReply(13L, request, 16L));
 
+    //then
+    assertEquals(MEMBER_IS_NOT_WRITER, customException.getErrorCode());
+  }
+
+  @Test
+  void successDeleteReply() {
+    //given
+    Reply reply = mock(Reply.class);
+    Member member = Member.builder()
+        .id(13L)
+        .build();
+
+    given(replyRepository.findById(anyLong())).willReturn(Optional.of(reply));
+    given(reply.getMember()).willReturn(member);
+    //when
+    replyService.deleteReply(144L, 13L);
+    //then
+    ArgumentCaptor<Reply> argumentCaptor = ArgumentCaptor.forClass(Reply.class);
+
+    verify(replyRepository).delete(argumentCaptor.capture());
+
+    assertEquals(reply, argumentCaptor.getValue());
+  }
+
+  @Test
+  void deleteReply_shouldThrowNotFoundReply_whenReplyIsNotExist() {
+    //given
+    given(replyRepository.findById(anyLong())).willReturn(Optional.empty());
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> replyService.deleteReply(144L, 13L));
+    //then
+    assertEquals(NOT_FOUND_REPLY, customException.getErrorCode());
+  }
+
+  @Test
+  void deleteReply_shouldThrowMemberIsNotExist_whenMemberIsNotExist() {
+    //given
+    Reply reply = mock(Reply.class);
+    Member member = Member.builder()
+        .id(6L)
+        .build();
+
+    given(replyRepository.findById(anyLong())).willReturn(Optional.of(reply));
+    given(reply.getMember()).willReturn(member);
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> replyService.deleteReply(144L, 13L));
     //then
     assertEquals(MEMBER_IS_NOT_WRITER, customException.getErrorCode());
   }
