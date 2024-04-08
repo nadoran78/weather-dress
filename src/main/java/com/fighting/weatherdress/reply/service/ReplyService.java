@@ -66,6 +66,22 @@ public class ReplyService {
 
   public ReplyResponse updateReply(long replyId, ReplyUpdateRequest request,
       long userId) {
+    Reply reply = findReplyAndCheckValidMember(replyId, userId);
+
+    reply.updateText(request.getText());
+
+    Reply savedReply = replyRepository.save(reply);
+
+    return ReplyResponse.fromEntity(savedReply);
+  }
+
+  public void deleteReply(long replyId, long userId) {
+    Reply reply = findReplyAndCheckValidMember(replyId, userId);
+
+    replyRepository.delete(reply);
+  }
+
+  private Reply findReplyAndCheckValidMember(long replyId, long userId) {
     Reply reply = replyRepository.findById(replyId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_REPLY));
 
@@ -73,11 +89,7 @@ public class ReplyService {
       throw new CustomException(MEMBER_IS_NOT_WRITER);
     }
 
-    reply.updateText(request.getText());
-
-    Reply savedReply = replyRepository.save(reply);
-
-    return ReplyResponse.fromEntity(savedReply);
+    return reply;
   }
 
 }
