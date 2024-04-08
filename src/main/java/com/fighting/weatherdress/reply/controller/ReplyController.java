@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,12 @@ public class ReplyController {
       @Valid @RequestBody ReplyUpdateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return replyService.updateReply(replyId, request, userDetails.getId());
+  }
+
+  @DeleteMapping("/{replyId}")
+  public void deleteReply(@PathVariable long replyId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    replyService.deleteReply(replyId, userDetails.getId());
   }
 
 }

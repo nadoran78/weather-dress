@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -244,5 +245,23 @@ class ReplyControllerTest {
         .andDo(print())
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.text").exists());
+  }
+
+  @Test
+  @WithMockCustomUser
+  void successDeleteReply() throws Exception {
+    //given
+    //when
+    mockMvc.perform(delete("/reply/12")
+        .with(csrf()))
+        .andDo(print())
+        .andExpect(status().isOk());
+    //then
+    ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+
+    verify(replyService).deleteReply(argumentCaptor.capture(), argumentCaptor.capture());
+
+    assertEquals(12L, argumentCaptor.getAllValues().get(0));
+    assertEquals(1L, argumentCaptor.getAllValues().get(1));
   }
 }
