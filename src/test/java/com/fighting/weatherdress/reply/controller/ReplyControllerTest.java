@@ -1,13 +1,14 @@
 package com.fighting.weatherdress.reply.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,7 @@ import com.fighting.weatherdress.config.WithMockCustomUser;
 import com.fighting.weatherdress.reply.dto.ReplyListDto;
 import com.fighting.weatherdress.reply.dto.ReplyRegisterRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
+import com.fighting.weatherdress.reply.dto.ReplyUpdateRequest;
 import com.fighting.weatherdress.reply.service.ReplyService;
 import com.fighting.weatherdress.security.dto.MemberInfoDto;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
@@ -174,4 +176,73 @@ class ReplyControllerTest {
                 replyListDtos.get(2).getCreatedAt().toString()));
   }
 
+  @Test
+  @WithMockCustomUser
+  void successUpdateReply() throws Exception {
+    //given
+    LocalDateTime now = LocalDateTime.now();
+    ReplyResponse response = ReplyResponse.builder()
+        .replyId(12L)
+        .text("멋져요")
+        .member(MemberInfoDto.builder()
+            .id(13L)
+            .email("test@test.com")
+            .nickName("벌거숭이")
+            .build())
+        .postId(14L)
+        .createdAt(now)
+        .build();
+    ReplyUpdateRequest request = ReplyUpdateRequest.builder()
+        .text("멋져요 수정")
+        .build();
+
+    given(replyService.updateReply(anyLong(), any(ReplyUpdateRequest.class), anyLong()))
+        .willReturn(response);
+    //when & then
+    mockMvc.perform(patch("/reply/12")
+            .content(objectMapper.writeValueAsString(request))
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(csrf()))
+        .andDo(print())
+        .andExpect(jsonPath("$.replyId").value(response.getReplyId()))
+        .andExpect(jsonPath("$.text").value(response.getText()))
+        .andExpect(jsonPath("$.member.id").value(response.getMember().getId()))
+        .andExpect(jsonPath("$.member.email").value(response.getMember().getEmail()))
+        .andExpect(
+            jsonPath("$.member.nickName").value(response.getMember().getNickName()))
+        .andExpect(jsonPath("$.postId").value(response.getPostId()))
+        .andExpect(jsonPath("$.createdAt").value(response.getCreatedAt().toString()));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void updateReply_shouldThrowInvalidException_whenTextSizeIsOver100() throws Exception {
+    //given
+    LocalDateTime now = LocalDateTime.now();
+    ReplyResponse response = ReplyResponse.builder()
+        .replyId(12L)
+        .text("멋져요")
+        .member(MemberInfoDto.builder()
+            .id(13L)
+            .email("test@test.com")
+            .nickName("벌거숭이")
+            .build())
+        .postId(14L)
+        .createdAt(now)
+        .build();
+    ReplyUpdateRequest request = ReplyUpdateRequest.builder()
+        .text("1".repeat(101))
+        .build();
+
+    given(replyService.updateReply(anyLong(), any(ReplyUpdateRequest.class), anyLong()))
+        .willReturn(response);
+    //when & then
+    mockMvc.perform(patch("/reply/12")
+            .content(objectMapper.writeValueAsString(request))
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(csrf()))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.text").exists());
+  }
 }
