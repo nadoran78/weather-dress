@@ -1,11 +1,13 @@
 package com.fighting.weatherdress.reply.service;
 
+import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_IS_NOT_WRITER;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
 import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -18,8 +20,9 @@ import com.fighting.weatherdress.member.repository.MemberRepository;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.PostRepository;
 import com.fighting.weatherdress.reply.dto.ReplyListDto;
-import com.fighting.weatherdress.reply.dto.ReplyRequest;
+import com.fighting.weatherdress.reply.dto.ReplyRegisterRequest;
 import com.fighting.weatherdress.reply.dto.ReplyResponse;
+import com.fighting.weatherdress.reply.dto.ReplyUpdateRequest;
 import com.fighting.weatherdress.reply.entity.Reply;
 import com.fighting.weatherdress.reply.repository.ReplyRepository;
 import java.time.LocalDateTime;
@@ -51,7 +54,7 @@ class ReplyServiceTest {
   @Test
   void successRegisterReply() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();
@@ -81,7 +84,7 @@ class ReplyServiceTest {
   @Test
   void registerReply_shouldThrowMemberNotFound_whenMemberIsNotExist() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();
@@ -97,7 +100,7 @@ class ReplyServiceTest {
   @Test
   void registerReply_shouldThrowPostNotFound_whenPostIsNotExist() {
     //given
-    ReplyRequest request = ReplyRequest.builder()
+    ReplyRegisterRequest request = ReplyRegisterRequest.builder()
         .postId(14L)
         .text("멋져요.")
         .build();
@@ -239,5 +242,90 @@ class ReplyServiceTest {
     Slice<ReplyListDto> replyList = replyService.getReplyList(12L, pageRequest);
     //then
     assertTrue(replyList.isEmpty());
+  }
+
+  @Test
+  void successUpdateRequest() {
+    //given
+    Member member = Member.builder()
+        .id(12L)
+        .email("test@test.com")
+        .nickName("별명")
+        .build();
+    Post post = Post.builder()
+        .id(15L)
+        .build();
+    Reply reply = spy(Reply.builder()
+        .text("멋있습니다.")
+        .member(member)
+        .post(post)
+        .build());
+    LocalDateTime now = LocalDateTime.now();
+    ReplyUpdateRequest request = ReplyUpdateRequest.builder()
+        .text("수정했습니다.")
+        .build();
+
+    given(replyRepository.findById(anyLong())).willReturn(Optional.of(reply));
+    given(reply.getId()).willReturn(13L);
+    given(reply.getCreatedAt()).willReturn(now);
+    given(replyRepository.save(any(Reply.class))).will(returnsFirstArg());
+    //when
+    ReplyResponse replyResponse = replyService.updateReply(13L, request, 12L);
+    //then
+    assertEquals(request.getText(), replyResponse.getText());
+    assertEquals(13L, replyResponse.getReplyId());
+    assertEquals(member.getId(), replyResponse.getMember().getId());
+    assertEquals(member.getEmail(), replyResponse.getMember().getEmail());
+    assertEquals(member.getNickName(), replyResponse.getMember().getNickName());
+    assertEquals(post.getId(), replyResponse.getPostId());
+    assertEquals(now, replyResponse.getCreatedAt());
+  }
+
+  @Test
+  void updateRequest_shouldThrowNotFoundReply_whenReplyIsNotExist() {
+    //given
+    ReplyUpdateRequest request = ReplyUpdateRequest.builder()
+        .text("수정했습니다.")
+        .build();
+
+    given(replyRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> replyService.updateReply(13L, request, 12L));
+
+    //then
+    assertEquals(NOT_FOUND_REPLY, customException.getErrorCode());
+  }
+
+  @Test
+  void updateRequest_shouldThrowMemberIsNotWriter_whenMemberIsNotWriter() {
+    //given
+    Member member = Member.builder()
+        .id(12L)
+        .email("test@test.com")
+        .nickName("별명")
+        .build();
+    Post post = Post.builder()
+        .id(15L)
+        .build();
+    Reply reply = spy(Reply.builder()
+        .text("멋있습니다.")
+        .member(member)
+        .post(post)
+        .build());
+    
+    ReplyUpdateRequest request = ReplyUpdateRequest.builder()
+        .text("수정했습니다.")
+        .build();
+
+    given(replyRepository.findById(anyLong())).willReturn(Optional.of(reply));
+
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> replyService.updateReply(13L, request, 16L));
+
+    //then
+    assertEquals(MEMBER_IS_NOT_WRITER, customException.getErrorCode());
   }
 }
