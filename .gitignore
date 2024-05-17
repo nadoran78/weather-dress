@@ -7,7 +7,7 @@ build/
 !**/src/test/**/build/
 application-private.properties
 env.properties
-application-product.yml
+application.properties
 
 ### STS ###
 .apt_generated
