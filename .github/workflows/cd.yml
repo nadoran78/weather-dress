@@ -1,4 +1,4 @@
-name: CI
+name: CD
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
       - name: Get current time
-        uses: jobStorer/get-current-time@v2.0.2
+        uses: josStorer/get-current-time@v2
         id: current-time
         with:
           format: YYYY-MM-DDHH-mm-ss
