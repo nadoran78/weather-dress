@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled
 @SpringBootTest
 class RolesConverterTest {
 
@@ -17,7 +18,6 @@ class RolesConverterTest {
   private MemberRepository memberRepository;
 
   @Test
-  @Disabled
   void successConverter() {
     //given
     SignUpDto request = SignUpDto.builder()

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled
 @SpringBootTest
 class NaverAuthControllerTest {
 
@@ -18,7 +19,6 @@ class NaverAuthControllerTest {
   private ClientKeyConfig clientKeyConfig;
 
   @Test
-  @Disabled
   @DisplayName("소셜 로그인 접속 url 생성(브라우저를 통해 직접 url 접속하여 테스트 성공)")
   void generateAuthUri() {
     String apiUri = "https://nid.naver.com/oauth2.0/authorize?response_type=code";
