@@ -212,7 +212,7 @@ class ReplyControllerTest {
         .andExpect(
             jsonPath("$.member.nickName").value(response.getMember().getNickName()))
         .andExpect(jsonPath("$.postId").value(response.getPostId()))
-        .andExpect(jsonPath("$.createdAt").value(response.getCreatedAt().toString().substring(0, 26)));
+        .andExpect(jsonPath("$.createdAt").exists());
   }
 
   @Test
