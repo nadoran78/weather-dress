@@ -1,0 +1,84 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${RDS_USER}
+    password: ${RDS_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    database: mysql
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 30MB
+
+  data:
+    redis:
+      host: ${PROD_REDIS_HOST}
+      port: ${PROD_REDIS_PORT}
+
+  mail:
+    host: smtp.gmail.com
+    port: ${PROD_SMTP_PORT}
+    username: ${PROD_SMTP_EMAIL}
+    password: ${PROD_SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          naver:
+            client-id: ${NAVER_OAUTH2_CLIENT_ID}
+            client-secret: ${NAVER_OAUTH2_CLIENT_SECRET}
+
+short:
+  weather:
+    service-key: ${SHORT_WEATHER_SERVICE_KEY}
+    num-of-rows: ${SHORT_WEATHER_NUM_OF_ROWS}
+    data-type: ${SHORT_WEATHER_DATATYPE}
+
+long:
+  weather:
+    service-key: ${LONG_WEATHER_SERVICE_KEY}
+    num-of-rows: ${LONG_WEATHER_NUM_OF_ROWS}
+    data-type: ${LONG_WEATHER_DATATYPE}
+
+location:
+  convert:
+    kakao-key: ${LOCATION_CONVERT_KAKAO_KEY}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${PROD_IMAGE_BUCKET_NAME}
+    credentials:
+      access-key: ${PROD_AWS_IMAGE_ACCESS_KEY}
+      secret-key: ${PROD_AWS_IMAGE_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+schedules:
+  cron:
+    update:
+      weather: ${SCHEDULE_CRON_UPDATE_WEATHER}

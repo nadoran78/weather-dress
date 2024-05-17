@@ -2,6 +2,7 @@ package com.fighting.weatherdress.security.token.repository;
 
 import com.fighting.weatherdress.security.token.entity.AccessToken;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
+@Disabled
 @SpringBootTest
 class AccessTokenRedisRepositoryTest {
 

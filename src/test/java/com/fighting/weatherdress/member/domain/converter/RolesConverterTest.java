@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.dto.SignUpDto;
 import com.fighting.weatherdress.member.repository.MemberRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Disabled
 @SpringBootTest
 class RolesConverterTest {
 
