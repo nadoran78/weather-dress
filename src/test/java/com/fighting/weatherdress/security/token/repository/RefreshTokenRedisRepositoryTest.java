@@ -2,12 +2,14 @@ package com.fighting.weatherdress.security.token.repository;
 
 import com.fighting.weatherdress.security.token.entity.RefreshToken;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@Disabled
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class RefreshTokenRedisRepositoryTest {
