@@ -49,6 +49,9 @@ spring:
             client-id: ${NAVER_OAUTH2_CLIENT_ID}
             client-secret: ${NAVER_OAUTH2_CLIENT_SECRET}
 
+  jwt:
+    secret: ${JWT_SECRET}
+
 short:
   weather:
     service-key: ${SHORT_WEATHER_SERVICE_KEY}
