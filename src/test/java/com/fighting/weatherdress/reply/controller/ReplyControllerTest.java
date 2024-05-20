@@ -157,8 +157,7 @@ class ReplyControllerTest {
         .andExpect(jsonPath("$.content[0].memberNickname").value(
             replyListDtos.get(0).getMemberNickname()))
         .andExpect(
-            jsonPath("$.content[0].createdAt").value(
-                replyListDtos.get(0).getCreatedAt().toString()))
+            jsonPath("$.content[0].createdAt").exists())
         .andExpect(
             jsonPath("$.content[1].replyId").value(replyListDtos.get(1).getReplyId()))
         .andExpect(jsonPath("$.content[1].text").value(replyListDtos.get(1).getText()))

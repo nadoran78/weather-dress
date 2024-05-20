@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT}
+  port: 5000
 
 spring:
 
@@ -26,7 +26,7 @@ spring:
   data:
     redis:
       host: ${PROD_REDIS_HOST}
-      port: ${PROD_REDIS_PORT}
+      port: 6379
 
   mail:
     host: smtp.gmail.com
