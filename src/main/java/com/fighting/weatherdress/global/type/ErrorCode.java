@@ -40,7 +40,8 @@ public enum ErrorCode {
   MEMBER_NOT_FOUND(NOT_FOUND, "가입한 멤버가 존재하지 않습니다."),
   POST_NOT_FOUND(NOT_FOUND, "작성된 게시글이 존재하지 않습니다."),
   MEMBER_IS_NOT_WRITER(FORBIDDEN, "작성자가 아닙니다."),
-  NOT_FOUND_REPLY(NOT_FOUND, "해당 답글이 존재하지 않습니다.")
+  NOT_FOUND_REPLY(NOT_FOUND, "해당 답글이 존재하지 않습니다."),
+  INVALID_LIKE_REQUEST(BAD_REQUEST, "게시글과 답글 중 하나만 좋아요 등록 요청해야 합니다.")
 
   ;
 

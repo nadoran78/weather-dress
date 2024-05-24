@@ -2,6 +2,7 @@ package com.fighting.weatherdress.post.entity;
 
 import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.entity.Location;
+import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.weather.dto.ShortTermWeatherResponse;
 import jakarta.persistence.CascadeType;
@@ -28,7 +29,7 @@ import org.hibernate.envers.AuditOverride;
 @Builder
 @Entity
 @AuditOverride(forClass = BaseEntity.class)
-public class Post extends BaseEntity {
+public class Post extends BaseEntity implements LikeTarget {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

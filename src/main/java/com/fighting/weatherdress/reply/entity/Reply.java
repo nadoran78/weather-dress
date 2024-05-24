@@ -1,6 +1,7 @@
 package com.fighting.weatherdress.reply.entity;
 
 import com.fighting.weatherdress.global.entity.BaseEntity;
+import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.post.entity.Post;
 import jakarta.persistence.Entity;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
-public class Reply extends BaseEntity {
+public class Reply extends BaseEntity implements LikeTarget {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
