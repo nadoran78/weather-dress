@@ -1,6 +1,8 @@
 package com.fighting.weatherdress.like.entity;
 
 import com.fighting.weatherdress.global.entity.BaseEntity;
+import com.fighting.weatherdress.like.dto.LikeRegisterRequest;
+import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.reply.entity.Reply;
@@ -11,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +34,7 @@ public class Like extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
+  @NotNull
   private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -40,4 +44,21 @@ public class Like extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reply_id")
   private Reply reply;
+
+  public static Like toEntity(LikeTarget likeTarget, Member member, boolean isLikeForPost) {
+    Like like;
+    if (isLikeForPost) {
+      like = Like.builder()
+          .member(member)
+          .post((Post) likeTarget)
+          .build();
+    } else {
+      like = Like.builder()
+          .member(member)
+          .reply((Reply) likeTarget)
+          .build();
+    }
+    return like;
+  }
+
 }
