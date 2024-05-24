@@ -1,7 +1,6 @@
 package com.fighting.weatherdress.like.entity;
 
 import com.fighting.weatherdress.global.entity.BaseEntity;
-import com.fighting.weatherdress.like.dto.LikeRegisterRequest;
 import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.post.entity.Post;
@@ -13,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +26,7 @@ import org.hibernate.envers.AuditOverride;
 @NoArgsConstructor
 @AllArgsConstructor
 @AuditOverride(forClass = BaseEntity.class)
+@Table(name = "`like`")
 public class Like extends BaseEntity {
 
   @Id
