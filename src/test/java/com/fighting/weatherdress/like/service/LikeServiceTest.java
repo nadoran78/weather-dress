@@ -1,6 +1,7 @@
 package com.fighting.weatherdress.like.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -153,6 +154,44 @@ class LikeServiceTest {
         () -> likeService.registerLike(request, 133L));
     //then
     assertEquals(customException.getErrorCode(), ErrorCode.MEMBER_NOT_FOUND);
+  }
+
+  @Test
+  void registerLike_throwAlreadyRegisteredLike_whenRegisterLikeRequestForPostIsAlreadyExist() {
+    //given
+    LikeRegisterRequest request = LikeRegisterRequest.builder()
+        .postId(13L)
+        .build();
+    Post post = mock(Post.class);
+    Member member = mock(Member.class);
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+    given(likeRepository.findByPostAndMember(any(Post.class), any(Member.class)))
+        .willReturn(Optional.of(mock(Like.class)));
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> likeService.registerLike(request, 133L));
+    //then
+    assertEquals(customException.getErrorCode(), ErrorCode.ALREADY_REGISTERED_LIKE);
+  }
+
+  @Test
+  void registerLike_throwAlreadyRegisteredLike_whenRegisterLikeRequestForReplyIsAlreadyExist() {
+    //given
+    LikeRegisterRequest request = LikeRegisterRequest.builder()
+        .replyId(13L)
+        .build();
+    Reply reply = mock(Reply.class);
+    Member member = mock(Member.class);
+    given(replyRepository.findById(anyLong())).willReturn(Optional.of(reply));
+    given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+    given(likeRepository.findByReplyAndMember(any(Reply.class), any(Member.class)))
+        .willReturn(Optional.of(mock(Like.class)));
+    //when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> likeService.registerLike(request, 133L));
+    //then
+    assertEquals(customException.getErrorCode(), ErrorCode.ALREADY_REGISTERED_LIKE);
   }
 
 }

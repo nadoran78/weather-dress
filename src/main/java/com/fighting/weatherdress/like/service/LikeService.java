@@ -1,5 +1,6 @@
 package com.fighting.weatherdress.like.service;
 
+import static com.fighting.weatherdress.global.type.ErrorCode.ALREADY_REGISTERED_LIKE;
 import static com.fighting.weatherdress.global.type.ErrorCode.INVALID_LIKE_REQUEST;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
@@ -12,7 +13,9 @@ import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.like.repository.LikeRepository;
 import com.fighting.weatherdress.member.domain.Member;
 import com.fighting.weatherdress.member.repository.MemberRepository;
+import com.fighting.weatherdress.post.entity.Post;
 import com.fighting.weatherdress.post.repository.PostRepository;
+import com.fighting.weatherdress.reply.entity.Reply;
 import com.fighting.weatherdress.reply.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +37,22 @@ public class LikeService {
     Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
+    checkRegisteredOnlyOneLikeByMember(likeTarget, isLikeForPost, member);
+
     likeRepository.save(Like.toEntity(likeTarget, member, isLikeForPost));
+  }
+
+  private void checkRegisteredOnlyOneLikeByMember(LikeTarget likeTarget,
+      boolean isLikeForPost, Member member) {
+    if (isLikeForPost) {
+      if (likeRepository.findByPostAndMember((Post) likeTarget, member).isPresent()) {
+        throw new CustomException(ALREADY_REGISTERED_LIKE);
+      }
+    } else {
+      if (likeRepository.findByReplyAndMember((Reply) likeTarget, member).isPresent()) {
+        throw new CustomException(ALREADY_REGISTERED_LIKE);
+      }
+    }
   }
 
   private boolean checkLikeForPost(LikeRegisterRequest request) {
