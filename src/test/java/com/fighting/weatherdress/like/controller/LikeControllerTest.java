@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fighting.weatherdress.config.WithMockCustomUser;
-import com.fighting.weatherdress.like.dto.LikeRegisterRequest;
+import com.fighting.weatherdress.like.dto.LikeRequest;
 import com.fighting.weatherdress.like.service.LikeService;
 import com.fighting.weatherdress.security.filter.JwtAuthenticationFilter;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class LikeControllerTest {
   @WithMockCustomUser
   void successRegisterLike() throws Exception {
     //given
-    LikeRegisterRequest request = LikeRegisterRequest.builder()
+    LikeRequest request = LikeRequest.builder()
         .postId(1L)
         .build();
     //when

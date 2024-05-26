@@ -6,7 +6,7 @@ import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
 import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 
 import com.fighting.weatherdress.global.exception.CustomException;
-import com.fighting.weatherdress.like.dto.LikeRegisterRequest;
+import com.fighting.weatherdress.like.dto.LikeRequest;
 import com.fighting.weatherdress.like.entity.Like;
 import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.like.repository.LikeRepository;
@@ -26,7 +26,7 @@ public class LikeService {
   private final ReplyRepository replyRepository;
   private final MemberRepository memberRepository;
 
-  public void registerLike(LikeRegisterRequest request, long memberId) {
+  public void registerLike(LikeRequest request, long memberId) {
     boolean isLikeForPost = checkLikeForPost(request);
 
     LikeTarget likeTarget = getLikeTarget(request, isLikeForPost);
@@ -37,7 +37,7 @@ public class LikeService {
     likeRepository.save(Like.toEntity(likeTarget, member, isLikeForPost));
   }
 
-  private boolean checkLikeForPost(LikeRegisterRequest request) {
+  private boolean checkLikeForPost(LikeRequest request) {
     if (request.getPostId() != null && request.getReplyId() == null) {
       return true;
     } else if (request.getReplyId() != null && request.getPostId() == null) {
@@ -47,7 +47,7 @@ public class LikeService {
     }
   }
 
-  private LikeTarget getLikeTarget(LikeRegisterRequest request, boolean isLikeForPost) {
+  private LikeTarget getLikeTarget(LikeRequest request, boolean isLikeForPost) {
     LikeTarget likeTarget;
     if (isLikeForPost) {
       likeTarget = postRepository.findById(request.getPostId())

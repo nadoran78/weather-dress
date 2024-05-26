@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class LikeRegisterRequest {
+public class LikeRequest {
 
   private Long postId;
 
