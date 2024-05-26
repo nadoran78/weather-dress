@@ -44,7 +44,8 @@ public enum ErrorCode {
   NOT_FOUND_REPLY(NOT_FOUND, "해당 답글이 존재하지 않습니다."),
   INVALID_LIKE_REQUEST(BAD_REQUEST, "게시글과 답글 중 하나만 좋아요 등록 요청해야 합니다."),
 
-  ALREADY_REGISTERED_LIKE(FORBIDDEN, "좋아요는 한번만 가능합니다.")
+  ALREADY_REGISTERED_LIKE(FORBIDDEN, "좋아요는 한번만 가능합니다."),
+  NOT_FOUND_LIKE(NOT_FOUND, "좋아요가 존재하지 않습니다.")
   ;
 
   private final HttpStatus status;

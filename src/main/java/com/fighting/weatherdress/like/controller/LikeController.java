@@ -23,5 +23,10 @@ public class LikeController {
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     likeService.registerLike(request, userDetails.getId());
   }
+  @DeleteMapping
+  public void cancelLike(@RequestBody LikeRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    likeService.cancelLike(request, userDetails.getId());
+  }
 
 }

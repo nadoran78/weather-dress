@@ -3,6 +3,7 @@ package com.fighting.weatherdress.like.service;
 import static com.fighting.weatherdress.global.type.ErrorCode.ALREADY_REGISTERED_LIKE;
 import static com.fighting.weatherdress.global.type.ErrorCode.INVALID_LIKE_REQUEST;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
+import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LIKE;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
 import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 
@@ -40,6 +41,32 @@ public class LikeService {
     checkRegisteredOnlyOneLikeByMember(likeTarget, isLikeForPost, member);
 
     likeRepository.save(Like.toEntity(likeTarget, member, isLikeForPost));
+  }
+
+  public void cancelLike(LikeRequest request, long memberId) {
+    boolean isLikeForPost = checkLikeForPost(request);
+
+    LikeTarget likeTarget = getLikeTarget(request, isLikeForPost);
+
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+    Like like = getLikeEntity(likeTarget, member, isLikeForPost);
+
+    likeRepository.delete(like);
+  }
+
+  private Like getLikeEntity(LikeTarget likeTarget, Member member,
+      boolean isLikeForPost) {
+    Like like;
+    if (isLikeForPost) {
+      like = likeRepository.findByPostAndMember((Post) likeTarget, member)
+          .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
+    } else {
+      like = likeRepository.findByReplyAndMember((Reply) likeTarget, member)
+          .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
+    }
+    return like;
   }
 
   private void checkRegisteredOnlyOneLikeByMember(LikeTarget likeTarget,
