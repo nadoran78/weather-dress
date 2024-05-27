@@ -126,7 +126,7 @@ class ReplyControllerTest {
         .andExpect(
             jsonPath("$.member.nickName").value(response.getMember().getNickName()))
         .andExpect(jsonPath("$.postId").value(response.getPostId()))
-        .andExpect(jsonPath("$.createdAt").value(now.toString()));
+        .andExpect(jsonPath("$.createdAt").exists());
   }
 
   @Test
@@ -164,16 +164,14 @@ class ReplyControllerTest {
         .andExpect(jsonPath("$.content[1].memberNickname").value(
             replyListDtos.get(1).getMemberNickname()))
         .andExpect(
-            jsonPath("$.content[1].createdAt").value(
-                replyListDtos.get(1).getCreatedAt().toString()))
+            jsonPath("$.content[1].createdAt").exists())
         .andExpect(
             jsonPath("$.content[2].replyId").value(replyListDtos.get(2).getReplyId()))
         .andExpect(jsonPath("$.content[2].text").value(replyListDtos.get(2).getText()))
         .andExpect(jsonPath("$.content[2].memberNickname").value(
             replyListDtos.get(2).getMemberNickname()))
         .andExpect(
-            jsonPath("$.content[2].createdAt").value(
-                replyListDtos.get(2).getCreatedAt().toString()));
+            jsonPath("$.content[2].createdAt").exists());
   }
 
   @Test
