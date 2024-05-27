@@ -46,24 +46,18 @@ public class LikeService {
   public void cancelLike(LikeRequest request, long memberId) {
     boolean isLikeForPost = checkLikeForPost(request);
 
-    LikeTarget likeTarget = getLikeTarget(request, isLikeForPost);
-
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-    Like like = getLikeEntity(likeTarget, member, isLikeForPost);
+    Like like = getLikeEntity(request, memberId, isLikeForPost);
 
     likeRepository.delete(like);
   }
 
-  private Like getLikeEntity(LikeTarget likeTarget, Member member,
-      boolean isLikeForPost) {
+  private Like getLikeEntity(LikeRequest request, long memberId, boolean isLikeForPost) {
     Like like;
     if (isLikeForPost) {
-      like = likeRepository.findByPostAndMember((Post) likeTarget, member)
+      like = likeRepository.findByPost_IdAndMember_Id(request.getPostId(), memberId)
           .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
     } else {
-      like = likeRepository.findByReplyAndMember((Reply) likeTarget, member)
+      like = likeRepository.findByReply_IdAndMember_Id(request.getReplyId(), memberId)
           .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
     }
     return like;
