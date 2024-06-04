@@ -3,11 +3,12 @@ package com.fighting.weatherdress.like.service;
 import static com.fighting.weatherdress.global.type.ErrorCode.ALREADY_REGISTERED_LIKE;
 import static com.fighting.weatherdress.global.type.ErrorCode.INVALID_LIKE_REQUEST;
 import static com.fighting.weatherdress.global.type.ErrorCode.MEMBER_NOT_FOUND;
+import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_LIKE;
 import static com.fighting.weatherdress.global.type.ErrorCode.NOT_FOUND_REPLY;
 import static com.fighting.weatherdress.global.type.ErrorCode.POST_NOT_FOUND;
 
 import com.fighting.weatherdress.global.exception.CustomException;
-import com.fighting.weatherdress.like.dto.LikeRegisterRequest;
+import com.fighting.weatherdress.like.dto.LikeRequest;
 import com.fighting.weatherdress.like.entity.Like;
 import com.fighting.weatherdress.like.etc.LikeTarget;
 import com.fighting.weatherdress.like.repository.LikeRepository;
@@ -29,7 +30,7 @@ public class LikeService {
   private final ReplyRepository replyRepository;
   private final MemberRepository memberRepository;
 
-  public void registerLike(LikeRegisterRequest request, long memberId) {
+  public void registerLike(LikeRequest request, long memberId) {
     boolean isLikeForPost = checkLikeForPost(request);
 
     LikeTarget likeTarget = getLikeTarget(request, isLikeForPost);
@@ -40,6 +41,26 @@ public class LikeService {
     checkRegisteredOnlyOneLikeByMember(likeTarget, isLikeForPost, member);
 
     likeRepository.save(Like.toEntity(likeTarget, member, isLikeForPost));
+  }
+
+  public void cancelLike(LikeRequest request, long memberId) {
+    boolean isLikeForPost = checkLikeForPost(request);
+
+    Like like = getLikeEntity(request, memberId, isLikeForPost);
+
+    likeRepository.delete(like);
+  }
+
+  private Like getLikeEntity(LikeRequest request, long memberId, boolean isLikeForPost) {
+    Like like;
+    if (isLikeForPost) {
+      like = likeRepository.findByPost_IdAndMember_Id(request.getPostId(), memberId)
+          .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
+    } else {
+      like = likeRepository.findByReply_IdAndMember_Id(request.getReplyId(), memberId)
+          .orElseThrow(() -> new CustomException(NOT_FOUND_LIKE));
+    }
+    return like;
   }
 
   private void checkRegisteredOnlyOneLikeByMember(LikeTarget likeTarget,
@@ -55,7 +76,7 @@ public class LikeService {
     }
   }
 
-  private boolean checkLikeForPost(LikeRegisterRequest request) {
+  private boolean checkLikeForPost(LikeRequest request) {
     if (request.getPostId() != null && request.getReplyId() == null) {
       return true;
     } else if (request.getReplyId() != null && request.getPostId() == null) {
@@ -65,7 +86,7 @@ public class LikeService {
     }
   }
 
-  private LikeTarget getLikeTarget(LikeRegisterRequest request, boolean isLikeForPost) {
+  private LikeTarget getLikeTarget(LikeRequest request, boolean isLikeForPost) {
     LikeTarget likeTarget;
     if (isLikeForPost) {
       likeTarget = postRepository.findById(request.getPostId())
