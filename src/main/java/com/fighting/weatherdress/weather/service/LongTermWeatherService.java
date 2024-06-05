@@ -51,7 +51,7 @@ public class LongTermWeatherService {
         .sido(location.getSido())
         .sigungu(location.getSigungu())
         .weeklyWeathers(
-            location.getWeeklyWeathers()
+            weeklyWeatherRepository.findAllByLocation(location)
                 .stream()
                 .map(WeeklyWeatherDto::fromEntity)
                 .sorted((Comparator.comparing(WeeklyWeatherDto::getDate)))
@@ -73,8 +73,6 @@ public class LongTermWeatherService {
           location.getLocationLandCode());
       WeeklyTemperatureItem temperature = getWeeklyTemperatureFromApi(now,
           location.getLocationCode());
-
-      location.getWeeklyWeathers().clear();
 
       for (int i = 2; i <= 6; i++) {
         String minTemperature = "minTemperaturePlus" + i + "Days";
@@ -98,6 +96,8 @@ public class LongTermWeatherService {
         weeklyWeatherRepository.save(weeklyWeather);
       }
     }
+
+    weeklyWeatherRepository.deleteAllByCreatedAtBefore(now);
   }
 
   private Field getField(Class<?> inputClass, String fieldName)
@@ -111,7 +111,8 @@ public class LongTermWeatherService {
       String locationLandCode) throws URISyntaxException {
     URI uri = makeWeeklyForecastUri(locationLandCode, now);
 
-    ResponseEntity<ResponseFromWeeklyForecastApi> responseEntity = restTemplate.getForEntity(uri,
+    ResponseEntity<ResponseFromWeeklyForecastApi> responseEntity = restTemplate.getForEntity(
+        uri,
         ResponseFromWeeklyForecastApi.class);
     ResponseFromWeeklyForecastApi response = responseEntity.getBody();
 
@@ -137,7 +138,8 @@ public class LongTermWeatherService {
       String locationCode) throws URISyntaxException {
     URI uri = makeWeeklyTemperatureUri(locationCode, now);
 
-    ResponseEntity<ResponseFromWeeklyTemperatureApi> responseEntity = restTemplate.getForEntity(uri,
+    ResponseEntity<ResponseFromWeeklyTemperatureApi> responseEntity = restTemplate.getForEntity(
+        uri,
         ResponseFromWeeklyTemperatureApi.class);
     ResponseFromWeeklyTemperatureApi response = responseEntity.getBody();
 

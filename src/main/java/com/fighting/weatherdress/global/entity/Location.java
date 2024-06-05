@@ -49,10 +49,6 @@ public class Location extends BaseEntity{
 
   @Builder.Default
   @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<WeeklyWeather> weeklyWeathers = new ArrayList<>();
-
-  @Builder.Default
-  @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Post> posts = new ArrayList<>();
 
 }
