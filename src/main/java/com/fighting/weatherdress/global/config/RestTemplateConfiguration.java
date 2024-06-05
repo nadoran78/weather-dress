@@ -13,7 +13,7 @@ public class RestTemplateConfiguration {
     RestTemplate restTemplate = new RestTemplate();
     SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(5 * 60 * 1000);
-    requestFactory.setReadTimeout(10 * 1000);
+    requestFactory.setReadTimeout(5 * 60 * 1000);
 
     restTemplate.setRequestFactory(requestFactory);
 

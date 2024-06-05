@@ -1,5 +1,6 @@
 package com.fighting.weatherdress.weather.entity;
 
+import com.fighting.weatherdress.global.entity.BaseEntity;
 import com.fighting.weatherdress.global.entity.Location;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditOverride;
 
 @Getter
 @Setter
@@ -22,7 +24,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class WeeklyWeather {
+@AuditOverride(forClass = BaseEntity.class)
+public class WeeklyWeather extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
